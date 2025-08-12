@@ -1,11 +1,32 @@
-<div class="flex flex-wrap justify-center gap-4 mb-8" x-data="{ scores: @entangle('teams') }">
+<div class="flex flex-wrap justify-center gap-4 mb-8" 
+     x-data="{ scores: @entangle('teams'), recentChanges: @entangle('recentScoreChanges') }"
+     @clear-score-animation-js.window="
+        setTimeout(() => {
+            $wire.clearScoreAnimation($event.detail.teamId);
+        }, 3000);
+     ">
     @foreach($teams as $index => $team)
         <div 
             class="relative group"
             x-data="{ 
                 isActive: {{ $activeTeamId == $team['id'] ? 'true' : 'false' }},
                 score: {{ $team['score'] }},
-                prevScore: {{ $team['score'] }}
+                prevScore: {{ $team['score'] }},
+                showChange: false,
+                changeAmount: 0,
+                isCorrect: true,
+                
+                updateScoreChange(points, correct) {
+                    const pointValue = parseInt(points) || 0;
+                    this.changeAmount = pointValue;
+                    this.isCorrect = correct;
+                    this.showChange = true;
+                    
+                    setTimeout(() => {
+                        this.showChange = false;
+                        this.changeAmount = 0;
+                    }, 3000);
+                }
             }"
             x-init="
                 $watch('scores', (newScores) => {
@@ -14,10 +35,17 @@
                         prevScore = score;
                         score = newTeam.score;
                         // Trigger animation
-                        $el.querySelector('.score-change').classList.add('animate-ping');
+                        $el.querySelector('.score-change')?.classList.add('animate-ping');
                         setTimeout(() => {
-                            $el.querySelector('.score-change').classList.remove('animate-ping');
+                            $el.querySelector('.score-change')?.classList.remove('animate-ping');
                         }, 1000);
+                    }
+                });
+                
+                $watch('recentChanges', (changes) => {
+                    const change = changes[{{ $team['id'] }}];
+                    if (change && change.points !== undefined) {
+                        updateScoreChange(change.points, change.correct);
                     }
                 })
             ">
@@ -78,17 +106,23 @@
                     
                     <!-- Score Change Indicator -->
                     <div 
-                        x-show="score !== prevScore"
+                        x-show="showChange && changeAmount !== 0"
                         x-transition:enter="transition ease-out duration-500"
-                        x-transition:enter-start="opacity-0 translate-y-4"
-                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:enter-start="opacity-0 translate-y-4 scale-50"
+                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                         x-transition:leave="transition ease-in duration-500"
-                        x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0"
-                        class="absolute -top-6 right-0 text-sm font-bold"
-                        :class="score > prevScore ? 'text-green-400' : 'text-red-400'">
-                        <span x-text="score > prevScore ? '+' : '-'"></span>
-                        <span x-text="Math.abs(score - prevScore)"></span>
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-150"
+                        class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-2xl font-black animate-bounce"
+                        :class="isCorrect ? 'text-green-400' : 'text-red-400'"
+                        x-effect="
+                            const elem = $el.querySelector('.score-text');
+                            if (elem) {
+                                const amt = parseInt(changeAmount) || 0;
+                                elem.textContent = (amt > 0 ? '+' : '') + '$' + Math.abs(amt).toLocaleString();
+                            }
+                        ">
+                        <span class="score-text">$0</span>
                     </div>
                 </div>
                 

@@ -46,19 +46,35 @@
                     </h1>
                     
                     <div class="text-3xl text-center mb-8 text-blue-200">
-                        {{ $buzzerTeam ? $buzzerTeam->name : 'Select Your Wager' }}
+                        {{ $buzzerTeam ? $buzzerTeam->name : 'Select Team & Wager' }}
                     </div>
                     
-                    <div class="grid grid-cols-3 md:grid-cols-4 gap-4">
-                        @foreach([200, 400, 600, 800, 1000, 1200, 1500, 2000] as $amount)
-                            <button 
-                                wire:click="setWager({{ $amount }})" 
-                                class="group relative overflow-hidden bg-gradient-to-br from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 text-white font-bold py-4 px-6 rounded-xl text-2xl transition-all transform hover:scale-110 shadow-lg">
-                                <span class="relative z-10">${{ number_format($amount) }}</span>
-                                <div class="absolute inset-0 bg-white/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                            </button>
-                        @endforeach
-                    </div>
+                    @if(!$buzzerTeam)
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold text-yellow-300 mb-4 text-center">Select Team:</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                                @foreach($availableTeams as $team)
+                                    <button 
+                                        wire:click="selectTeamManually({{ $team->id }})"
+                                        class="px-4 py-3 rounded-lg font-bold text-white transition-all transform hover:scale-105 shadow-lg"
+                                        style="background-color: {{ $team->color_hex }}; border: 2px solid rgba(255,255,255,0.5)">
+                                        {{ $team->name }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-3 md:grid-cols-4 gap-4">
+                            @foreach([200, 400, 600, 800, 1000, 1200, 1500, 2000] as $amount)
+                                <button 
+                                    wire:click="setWager({{ $amount }})" 
+                                    class="group relative overflow-hidden bg-gradient-to-br from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 text-white font-bold py-4 px-6 rounded-xl text-2xl transition-all transform hover:scale-110 shadow-lg">
+                                    <span class="relative z-10">${{ number_format($amount) }}</span>
+                                    <div class="absolute inset-0 bg-white/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         @else
@@ -149,6 +165,27 @@
                         </div>
                     @endif
                     
+                    <!-- Manual Team Selection -->
+                    @if($showManualTeamSelection && !$buzzerTeam)
+                        <div class="mb-6 p-4 bg-black/30 rounded-xl"
+                             x-show="showContent"
+                             x-transition:enter="transition ease-out duration-500"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100">
+                            <h3 class="text-xl font-bold text-yellow-400 mb-4 text-center">Select Team Manually:</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                @foreach($availableTeams as $team)
+                                    <button 
+                                        wire:click="selectTeamManually({{ $team->id }})"
+                                        class="px-4 py-3 rounded-lg font-bold text-white transition-all transform hover:scale-105 shadow-lg"
+                                        style="background-color: {{ $team->color_hex }}; border: 2px solid rgba(255,255,255,0.3)">
+                                        {{ $team->name }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                    
                     <!-- Host Controls -->
                     <div class="flex flex-wrap justify-center gap-4 mt-8"
                          x-show="showContent"
@@ -162,7 +199,7 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                                 </svg>
-                                Correct
+                                Correct (+${{ number_format($clue->value) }})
                             </button>
                             <button 
                                 wire:click="markIncorrect" 
@@ -170,7 +207,16 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
-                                Incorrect
+                                Incorrect (-${{ number_format($clue->value) }})
+                            </button>
+                        @else
+                            <button 
+                                wire:click="toggleManualTeamSelection" 
+                                class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                Manual Select Team
                             </button>
                         @endif
                         

@@ -17,5 +17,5 @@ use Illuminate\Support\Facades\Route;
 // Buzzer webhook endpoint
 Route::post('/buzzer', [BuzzerController::class, 'store'])->name('api.buzzer');
 Route::post('/buzzer/test', [BuzzerController::class, 'test'])->name('api.buzzer.test');
-Route::get('/buzzer/status', [BuzzerController::class, 'status'])->name('api.buzzer.status');
+Route::post('/buzzer/status', [BuzzerController::class, 'status'])->name('api.buzzer.status');
 Route::post('/buzzer/reset', [BuzzerController::class, 'reset'])->name('api.buzzer.reset');
