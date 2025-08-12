@@ -1,0 +1,533 @@
+/* Jeopardy Game Styles */
+
+:root {
+    --jeopardy-blue: #060CE9;
+    --jeopardy-dark-blue: #0A0F3D;
+    --jeopardy-gold: #FFD700;
+    --category-blue: #1E3A8A;
+    --answered-gray: #374151;
+}
+
+/* Game Board Grid */
+.jeopardy-board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Category Headers */
+.category-header {
+    background: var(--category-blue);
+    border: 2px solid var(--jeopardy-gold);
+    padding: 1rem;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Clue Cells */
+.clue-cell {
+    background: var(--jeopardy-blue);
+    border: 2px solid black;
+    padding: 1.5rem;
+    text-align: center;
+    font-weight: bold;
+    font-size: 2.5rem;
+    color: var(--jeopardy-gold);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clue-cell:hover:not(.answered) {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.clue-cell.answered {
+    background: var(--answered-gray);
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+/* Daily double styling removed to keep it a surprise */
+
+/* Clue Modal */
+.clue-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--jeopardy-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: zoomIn 0.3s ease;
+}
+
+.clue-text {
+    font-size: 4rem;
+    text-align: center;
+    padding: 2rem;
+    max-width: 90%;
+    line-height: 1.3;
+}
+
+/* Team Scoreboard */
+.team-score {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
+
+.team-score.active {
+    animation: pulse 1s infinite;
+    border-color: currentColor;
+}
+
+.score-value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.score-value.negative {
+    color: #ef4444;
+}
+
+/* Timer */
+.timer-display {
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 1rem;
+}
+
+.timer-display.warning {
+    color: #f59e0b;
+    animation: pulse 1s infinite;
+}
+
+.timer-display.danger {
+    color: #ef4444;
+    animation: pulse 0.5s infinite;
+}
+
+/* Lightning Round */
+.lightning-question {
+    font-size: 3rem;
+    text-align: center;
+    padding: 2rem;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Daily Double */
+.daily-double-modal {
+    background: linear-gradient(45deg, var(--jeopardy-blue), var(--jeopardy-dark-blue));
+    animation: spin-glow 2s ease-in-out;
+}
+
+.daily-double-text {
+    font-size: 5rem;
+    color: var(--jeopardy-gold);
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    animation: pulse-gold 1s infinite;
+}
+
+/* Animations */
+@keyframes zoomIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes pulse-gold {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 30px rgba(255, 215, 0, 1);
+    }
+}
+
+@keyframes spin-glow {
+    0% {
+        transform: rotate(0deg) scale(0.8);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.1);
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* Host Controls */
+.host-controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.host-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.host-button:hover {
+    transform: scale(1.05);
+}
+
+.host-button.correct {
+    background: #10b981;
+    color: white;
+}
+
+.host-button.incorrect {
+    background: #ef4444;
+    color: white;
+}
+
+.host-button.skip {
+    background: #6b7280;
+    color: white;
+}
+
+/* Keyboard Shortcut Display */
+.keyboard-help {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    z-index: 999;
+}
+
+.keyboard-help-item {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.keyboard-help-key {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+}
+
+/* Final Scores */
+.final-scores {
+    background: linear-gradient(45deg, var(--jeopardy-blue), var(--jeopardy-dark-blue));
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+}
+
+.winner-crown {
+    font-size: 3rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Animation Keyframes */
+@keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes bounce-right {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(0.25rem); }
+}
+
+@keyframes float-0 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes float-1 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-30px); }
+}
+
+@keyframes float-2 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-25px); }
+}
+
+@keyframes float-3 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-35px); }
+}
+
+@keyframes float-4 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+
+/* Animation Classes */
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+
+.animate-spin-slow {
+    animation: spin 3s linear infinite;
+}
+
+.animate-bounce-right {
+    animation: bounce-right 1s ease-in-out infinite;
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite;
+}
+
+.animate-float-0 {
+    animation: float-0 3s ease-in-out infinite;
+}
+
+.animate-float-1 {
+    animation: float-1 3.5s ease-in-out infinite;
+}
+
+.animate-float-2 {
+    animation: float-2 4s ease-in-out infinite;
+}
+
+.animate-float-3 {
+    animation: float-3 3.2s ease-in-out infinite;
+}
+
+.animate-float-4 {
+    animation: float-4 2.8s ease-in-out infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .jeopardy-board {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .clue-text {
+        font-size: 3rem;
+    }
+
+    .clue-cell {
+        font-size: 2rem;
+    }
+}
+
+/* 3D Transform Classes */
+.perspective-1000 {
+    perspective: 1000px;
+}
+.preserve-3d {
+    transform-style: preserve-3d;
+}
+.rotate-y-5:hover {
+    transform: rotateY(5deg);
+}
+.rotate-x-5:hover {
+    transform: rotateX(5deg);
+}
+.rotateX-90 {
+    transform: rotateX(90deg);
+}
+.rotateX-0 {
+    transform: rotateX(0deg);
+}
+
+/* Confetti Animation */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    z-index: 9999;
+    animation: confetti-fall 5s linear forwards;
+}
+
+@keyframes confetti-fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Floating Stars for Daily Double */
+.floating-star {
+    position: absolute;
+    font-size: 2rem;
+    animation: float-star 3s ease-in-out infinite;
+    z-index: 10;
+}
+
+@keyframes float-star {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-30px) rotate(180deg);
+        opacity: 0.7;
+    }
+}
+
+/* Score Flash Animation */
+.score-flash {
+    animation: flash 0.5s ease-out;
+}
+
+@keyframes flash {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.2);
+        filter: brightness(1.5);
+    }
+}
+
+/* Daily Double Reveal */
+.daily-double-reveal {
+    animation: dd-reveal 1s ease-out;
+}
+
+@keyframes dd-reveal {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+    }
+}
+
+/* Scroll Animations */
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+}
+
+.scroll-animate.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Category Card Effects */
+.category-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Lightning Effect for Lightning Round */
+.lightning-strike {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, #fbbf24, transparent);
+    animation: lightning-move 0.2s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes lightning-move {
+    0% {
+        opacity: 0;
+        transform: translateX(0) scaleY(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(10px) scaleY(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(20px) scaleY(0);
+    }
+}
+
+/* Stats Bar Animations */
+.stats-pulse {
+    animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gentle-pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.02);
+        opacity: 0.9;
+    }
+}

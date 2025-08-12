@@ -1,0 +1,178 @@
+<div x-data="{ mounted: false, selectedCategory: null }" x-init="mounted = true" class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+    @if($game)
+        <script>
+            window.gameId = {{ $game->id }};
+        </script>
+
+        <!-- Animated Background Pattern -->
+        <div class="fixed inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute inset-0 bg-black/20"></div>
+            <!-- Gradient Orbs -->
+            <div class="absolute top-20 left-20 w-96 h-96 bg-purple-500/30 rounded-full filter blur-3xl animate-blob"></div>
+            <div class="absolute top-40 right-20 w-96 h-96 bg-pink-500/30 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+            <div class="absolute bottom-20 left-1/2 w-96 h-96 bg-indigo-500/30 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+        </div>
+
+        <div class="relative container mx-auto px-4 py-6">
+            <!-- Title with Laravel Logo -->
+            <div class="text-center mb-6"
+                 x-show="mounted"
+                 x-transition:enter="transition ease-out duration-1000"
+                 x-transition:enter-start="opacity-0 -translate-y-10"
+                 x-transition:enter-end="opacity-100 translate-y-0">
+                <div class="flex flex-col items-center gap-4">
+                    <!-- Laravel Logo -->
+                    <svg class="w-64 h-16" width="1280" height="308" viewBox="0 0 1280 308" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50.2753 0H0V308.689H144.713V263.27H50.2753V0Z" fill="white"></path>
+                        <path d="M322.209 130.973C315.796 120.684 306.688 112.602 294.883 106.718C283.081 100.84 271.201 97.8969 259.253 97.8969C243.798 97.8969 229.665 100.764 216.843 106.496C204.014 112.228 193.015 120.099 183.834 130.091C174.654 140.088 167.51 151.628 162.412 164.706C157.308 177.792 154.761 191.54 154.761 205.94C154.761 220.645 157.308 234.457 162.412 247.39C167.508 260.332 174.652 271.796 183.834 281.788C193.015 291.785 204.017 299.647 216.843 305.379C229.665 311.111 243.798 313.978 259.253 313.978C271.201 313.978 283.081 311.038 294.883 305.159C306.688 299.282 315.796 291.197 322.209 280.904V308.685H369.865V103.186H322.209V130.973ZM317.837 231.076C314.922 239.016 310.841 245.925 305.598 251.804C300.35 257.687 294.009 262.389 286.579 265.917C279.146 269.445 270.905 271.208 261.875 271.208C252.837 271.208 244.676 269.445 237.391 265.917C230.104 262.389 223.839 257.687 218.593 251.804C213.345 245.925 209.335 239.016 206.57 231.076C203.794 223.138 202.417 214.759 202.417 205.942C202.417 197.12 203.794 188.742 206.57 180.804C209.335 172.866 213.345 165.961 218.593 160.078C223.839 154.201 230.102 149.493 237.391 145.965C244.676 142.437 252.837 140.674 261.875 140.674C270.908 140.674 279.146 142.437 286.579 145.965C294.009 149.493 300.35 154.199 305.598 160.078C310.844 165.961 314.922 172.866 317.837 180.804C320.748 188.742 322.209 197.12 322.209 205.942C322.209 214.759 320.748 223.138 317.837 231.076Z" fill="white"></path>
+                        <path d="M709.568 130.973C703.155 120.684 694.047 112.602 682.242 106.718C670.44 100.84 658.56 97.8969 646.612 97.8969C631.157 97.8969 617.024 100.764 604.202 106.496C591.373 112.228 580.374 120.099 571.193 130.091C562.013 140.088 554.869 151.628 549.771 164.706C544.666 177.792 542.12 191.54 542.12 205.94C542.12 220.645 544.666 234.457 549.771 247.39C554.867 260.332 562.01 271.796 571.193 281.788C580.374 291.785 591.375 299.647 604.202 305.379C617.024 311.111 631.157 313.978 646.612 313.978C658.56 313.978 670.44 311.038 682.242 305.159C694.047 299.282 703.155 291.197 709.568 280.904V308.685H757.224V103.186H709.568V130.973ZM705.198 231.076C702.283 239.016 698.202 245.925 692.959 251.804C687.711 257.687 681.37 262.389 673.94 265.917C666.507 269.445 658.266 271.208 649.236 271.208C640.198 271.208 632.037 269.445 624.752 265.917C617.465 262.389 611.2 257.687 605.954 251.804C600.706 245.925 596.696 239.016 593.931 231.076C591.155 223.138 589.778 214.759 589.778 205.942C589.778 197.12 591.155 188.742 593.931 180.804C596.696 172.866 600.706 165.961 605.954 160.078C611.2 154.201 617.463 149.493 624.752 145.965C632.037 142.437 640.198 140.674 649.236 140.674C658.269 140.674 666.507 142.437 673.94 145.965C681.37 149.493 687.711 154.199 692.959 160.078C698.205 165.961 702.283 172.866 705.198 180.804C708.109 188.742 709.57 197.12 709.57 205.942C709.568 214.759 708.107 223.138 705.198 231.076Z" fill="white"></path>
+                        <path d="M1280 1.12315e-05H1232.35V308.689H1280V1.12315e-05Z" fill="white"></path>
+                        <path d="M407.466 308.689H455.117V150.486H536.876V103.192H407.466V308.689Z" fill="white"></path>
+                        <path d="M948.281 103.192L888.386 260.557L828.489 103.192H780.224L858.441 308.689H918.331L996.546 103.192H948.281Z" fill="white"></path>
+                        <path d="M1100.48 97.908C1042.13 97.908 995.937 146.279 995.937 205.944C995.937 271.9 1040.64 313.98 1106.59 313.98C1143.5 313.98 1167.06 299.745 1195.85 268.746L1163.66 243.621C1163.64 243.646 1139.36 275.802 1103.1 275.802C1060.96 275.802 1043.22 241.533 1043.22 223.803H1201.32C1209.62 155.913 1165.37 97.908 1100.48 97.908ZM1043.35 188.085C1043.71 184.13 1049.2 136.086 1100.1 136.086C1151.01 136.086 1157.19 184.123 1157.55 188.085H1043.35Z" fill="white"></path>
+                    </svg>
+                    <!-- Jeopardy Text -->
+                    <h1 class="text-5xl md:text-6xl font-bold text-yellow-400 tracking-[0.3em]">
+                        JEOPARDY
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Team Scoreboard with Glass Effect -->
+            <div x-show="mounted"
+                 x-transition:enter="transition ease-out duration-1000 delay-200"
+                 x-transition:enter-start="opacity-0 translate-y-10"
+                 x-transition:enter-end="opacity-100 translate-y-0">
+                <livewire:team-scoreboard :game-id="$game->id" />
+            </div>
+
+            <!-- Game Board Container -->
+            <div class="max-w-7xl mx-auto mt-6">
+                <!-- Categories Row with 3D Effect -->
+                <div class="grid grid-cols-6 gap-3 mb-3">
+                    @foreach($categories as $index => $category)
+                        <div class="group perspective-1000"
+                             x-show="mounted"
+                             x-transition:enter="transition ease-out duration-700 delay-[{{ $index * 50 }}ms]"
+                             x-transition:enter-start="opacity-0 rotateX-90"
+                             x-transition:enter-end="opacity-100 rotateX-0"
+                             @mouseenter="selectedCategory = {{ $category->id }}"
+                             @mouseleave="selectedCategory = null">
+
+                            <!-- Glow Effect on Hover -->
+                            <div class="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl opacity-0 group-hover:opacity-75 blur-sm transition-opacity duration-300"></div>
+
+                            <!-- Category Card -->
+                            <div class="relative h-24 md:h-28 backdrop-blur-xl bg-gradient-to-br from-blue-800/90 to-indigo-900/90 border-2 border-yellow-400/70 rounded-xl p-3 flex items-center justify-center transform transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-1 shadow-xl group-hover:shadow-[0_20px_60px_rgba(250,204,21,0.3)]">
+                                <h3 class="font-black text-xs md:text-sm lg:text-base text-yellow-400 uppercase text-center leading-tight tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                    {{ $category->name }}
+                                </h3>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Clue Values Grid with Advanced Animations -->
+                <div class="grid grid-cols-6 gap-3">
+                    @foreach([100, 200, 300, 400] as $rowIndex => $value)
+                        @foreach($categories as $colIndex => $category)
+                            @php
+                                $clue = $category->clues->where('value', $value)->first();
+                                $delay = (($rowIndex) * 6 + $loop->index) * 30;
+                            @endphp
+
+                            @if($clue)
+                                <div class="group perspective-1000"
+                                     x-show="mounted"
+                                     x-transition:enter="transition ease-out duration-500 delay-[{{ $delay }}ms]"
+                                     x-transition:enter-start="opacity-0 scale-50 rotate-12"
+                                     x-transition:enter-end="opacity-100 scale-100 rotate-0">
+
+                                    @if(!$clue->is_answered)
+                                        <!-- Animated Border for Active Clues -->
+                                        <div class="absolute -inset-0.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 rounded-xl blur animate-pulse"></div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Clue Card -->
+                                    <div @if(!$clue->is_answered)
+                                            wire:click="selectClue({{ $clue->id }})"
+                                         @endif
+                                         class="relative h-24 md:h-28 lg:h-32 rounded-xl flex items-center justify-center cursor-pointer transform transition-all duration-300 preserve-3d
+                                                {{ $clue->is_answered
+                                                   ? 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm'
+                                                   : 'bg-gradient-to-br from-blue-600/90 to-purple-700/90 backdrop-blur-xl group-hover:scale-110 group-hover:rotate-y-5 group-hover:rotate-x-5 group-hover:shadow-2xl' }}"
+                                         :class="{ 'ring-4 ring-yellow-400/50': selectedCategory === {{ $category->id }} && !{{ $clue->is_answered ? 'true' : 'false' }} }">
+
+                                        @if(!$clue->is_answered)
+                                            <!-- Value Display -->
+                                            <div class="relative">
+                                                <div class="text-4xl md:text-5xl lg:text-6xl font-black text-yellow-400 drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] transform group-hover:scale-110 transition-transform duration-300">
+                                                    ${{ $value }}
+                                                </div>
+                                            </div>
+
+                                            <!-- Hover Effect Overlay -->
+                                            <div class="absolute inset-0 bg-gradient-to-t from-white/0 to-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        @else
+                                            <!-- Answered Indicator -->
+                                            <div class="text-gray-600">
+                                                <svg class="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @else
+                                <!-- Empty Cell -->
+                                <div class="h-24 md:h-28 lg:h-32 backdrop-blur-sm bg-gray-800/20 rounded-xl"
+                                     x-show="mounted"
+                                     x-transition:enter="transition ease-out duration-500 delay-[{{ $delay }}ms]"
+                                     x-transition:enter-start="opacity-0 scale-50"
+                                     x-transition:enter-end="opacity-100 scale-100">
+                                </div>
+                            @endif
+                        @endforeach
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Host Controls -->
+            @if($game->status === 'main_game')
+                <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40"
+                     x-show="mounted"
+                     x-transition:enter="transition ease-out duration-1000 delay-1000"
+                     x-transition:enter-start="opacity-0 translate-y-10"
+                     x-transition:enter-end="opacity-100 translate-y-0">
+                    <button
+                        wire:click="startLightningRound"
+                        class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg backdrop-blur-xl">
+                        <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Lightning Round
+                    </button>
+                </div>
+            @endif
+        </div>
+
+        <!-- Clue Display Modal -->
+        @if($showClueModal && $selectedClue)
+            <livewire:clue-display :clue-id="$selectedClue->id" />
+        @endif
+
+        <!-- Buzzer Listener -->
+        <livewire:buzzer-listener :game-id="$game->id" />
+    @else
+        <div class="flex items-center justify-center h-screen">
+            <div class="text-center backdrop-blur-lg bg-black/50 rounded-2xl p-12 border border-purple-500/30">
+                <h1 class="text-4xl font-bold mb-4 text-purple-400">No Game Found</h1>
+                <a href="{{ route('game.new') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg">
+                    Start New Game
+                </a>
+            </div>
+        </div>
+    @endif
+</div>
