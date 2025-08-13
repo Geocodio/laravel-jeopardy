@@ -30,17 +30,16 @@ test('sets up teams for a game', function () {
     $this->gameService->setupTeams($game);
     $game->refresh();
 
-    expect($game->teams)->toHaveCount(5);
+    $configuredTeams = config('jeopardy.teams');
+    expect($game->teams)->toHaveCount(count($configuredTeams));
     
     $teamNames = $game->teams->pluck('name')->toArray();
-    expect($teamNames)->toContain('Team Eloquent');
-    expect($teamNames)->toContain('Team Blade');
-    expect($teamNames)->toContain('Team Artisan');
-    expect($teamNames)->toContain('Team Forge');
-    expect($teamNames)->toContain('Team Cloud');
+    foreach ($configuredTeams as $team) {
+        expect($teamNames)->toContain($team['name']);
+    }
     
-    expect($game->teams->first()->buzzer_pin)->toBe(1);
-    expect($game->teams->last()->buzzer_pin)->toBe(5);
+    expect($game->teams->first()->buzzer_pin)->toBe($configuredTeams[0]['buzzer_pin']);
+    expect($game->teams->last()->buzzer_pin)->toBe($configuredTeams[count($configuredTeams) - 1]['buzzer_pin']);
     
     expect($game->gameLogs()->where('action', 'teams_created')->exists())->toBeTrue();
 });
@@ -78,6 +77,8 @@ test('places daily double on eligible clue', function () {
     $game = Game::factory()->create();
     $category = Category::factory()->create(['game_id' => $game->id]);
     
+    $minValue = config('jeopardy.game_settings.daily_double_min_value', 200);
+    
     Clue::factory()->create(['category_id' => $category->id, 'value' => 100]);
     Clue::factory()->create(['category_id' => $category->id, 'value' => 200]);
     Clue::factory()->create(['category_id' => $category->id, 'value' => 300]);
@@ -90,7 +91,7 @@ test('places daily double on eligible clue', function () {
         ->get();
     
     expect($dailyDoubleClues)->toHaveCount(1);
-    expect($dailyDoubleClues->first()->value)->toBeGreaterThanOrEqual(200);
+    expect($dailyDoubleClues->first()->value)->toBeGreaterThanOrEqual($minValue);
     
     expect($game->gameLogs()->where('action', 'daily_double_placed')->exists())->toBeTrue();
 });

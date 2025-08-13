@@ -28,13 +28,7 @@ class GameService
 
     public function setupTeams(Game $game): void
     {
-        $teams = [
-            ['name' => 'Team Eloquent', 'color_hex' => '#3B82F6', 'buzzer_pin' => 1],
-            ['name' => 'Team Blade', 'color_hex' => '#10B981', 'buzzer_pin' => 2],
-            ['name' => 'Team Artisan', 'color_hex' => '#EAB308', 'buzzer_pin' => 3],
-            ['name' => 'Team Forge', 'color_hex' => '#FFFFFF', 'buzzer_pin' => 4],
-            ['name' => 'Team Cloud', 'color_hex' => '#EF4444', 'buzzer_pin' => 5],
-        ];
+        $teams = config('jeopardy.teams');
 
         foreach ($teams as $teamData) {
             $game->teams()->create($teamData);
@@ -191,7 +185,7 @@ class GameService
         $game = Game::with('categories.clues')->findOrFail($gameId);
         
         $eligibleClues = $game->categories->flatMap(function ($category) {
-            return $category->clues->where('value', '>=', 200);
+            return $category->clues->where('value', '>=', config('jeopardy.game_settings.daily_double_min_value', 200));
         });
 
         if ($eligibleClues->isNotEmpty()) {

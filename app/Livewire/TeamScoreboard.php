@@ -33,13 +33,6 @@ class TeamScoreboard extends Component
     #[On('score-updated')]
     public function handleScoreUpdate($teamId, $points, $correct)
     {
-        \Log::info('TeamScoreboard received score update', [
-            'teamId' => $teamId,
-            'points' => $points,
-            'correct' => $correct,
-            'type_of_points' => gettype($points),
-        ]);
-        
         $this->recentScoreChanges[$teamId] = [
             'points' => (int) $points,
             'correct' => $correct,

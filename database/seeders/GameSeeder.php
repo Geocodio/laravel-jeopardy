@@ -19,14 +19,8 @@ class GameSeeder extends Seeder
             'daily_double_used' => false,
         ]);
 
-        // Create teams
-        $teams = [
-            ['name' => 'Team Eloquent', 'color_hex' => '#3B82F6', 'buzzer_pin' => 1],
-            ['name' => 'Team Blade', 'color_hex' => '#10B981', 'buzzer_pin' => 2],
-            ['name' => 'Team Artisan', 'color_hex' => '#EAB308', 'buzzer_pin' => 3],
-            ['name' => 'Team Forge', 'color_hex' => '#FFFFFF', 'buzzer_pin' => 4],
-            ['name' => 'Team Cloud', 'color_hex' => '#EF4444', 'buzzer_pin' => 5],
-        ];
+        // Create teams from config
+        $teams = config('jeopardy.teams');
 
         foreach ($teams as $teamData) {
             $game->teams()->create($teamData);
@@ -166,7 +160,7 @@ class GameSeeder extends Seeder
         // Place one Daily Double randomly
         $eligibleClues = Clue::whereHas('category', function ($query) use ($game) {
             $query->where('game_id', $game->id);
-        })->where('value', '>=', 200)->get();
+        })->where('value', '>=', config('jeopardy.game_settings.daily_double_min_value', 200))->get();
 
         if ($eligibleClues->isNotEmpty()) {
             $eligibleClues->random()->update(['is_daily_double' => true]);

@@ -103,14 +103,6 @@ class ClueDisplay extends Component
 
         $pointsAwarded = $this->isDailyDouble ? (int) $this->wagerAmount : (int) $this->clue->value;
 
-        // Debug logging
-        \Log::info('Points awarded calculation', [
-            'isDailyDouble' => $this->isDailyDouble,
-            'wagerAmount' => $this->wagerAmount,
-            'clueValue' => $this->clue->value,
-            'pointsAwarded' => $pointsAwarded,
-        ]);
-
         if ($this->isDailyDouble) {
             $this->scoringService->handleDailyDouble(
                 $this->buzzerTeam->id,

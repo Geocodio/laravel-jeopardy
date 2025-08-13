@@ -7,12 +7,12 @@ A web-based Jeopardy game built with Laravel, Livewire, Tailwind CSS 4, and Alpi
 
 ### Teams
 - 5 teams, each with 2 members
-- Laravel-themed team names:
-  1. **Team Eloquent** (Blue - #3B82F6)
-  2. **Team Blade** (Green - #10B981)
-  3. **Team Artisan** (Yellow - #EAB308)
-  4. **Team Forge** (White - #FFFFFF)
-  5. **Team Cloud** (Red - #EF4444)
+- Laravel-themed team names (configured in config/jeopardy.php):
+  1. **Team Illuminate** (Blue - #3B82F6)
+  2. **Team Facade** (Green - #10B981)
+  3. **Team Eloquent** (Yellow - #EAB308)
+  4. **Team Blade** (White - #FFFFFF)
+  5. **Team Artisan** (Red - #EF4444)
 
 ### Main Game (20 minutes)
 - 5-6 Laravel-themed categories
@@ -308,8 +308,8 @@ Events:
 │  $400   │  $400   │  $400   │  $400   │  $400   │  $400   │
 └─────────┴─────────┴─────────┴─────────┴─────────┴─────────┘
 │                                                   │
-│  [Eloquent: $800] [Blade: $600] [Artisan: $1200] │
-│  [Forge: $400]    [Cloud: $1000]                 │
+│  [Illuminate: $800] [Facade: $600] [Eloquent: $1200] │
+│  [Blade: $400]    [Artisan: $1000]                 │
 └──────────────────────────────────────────────────┘
 ```
 
