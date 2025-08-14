@@ -5,6 +5,7 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\GameBoard;
 use App\Livewire\LightningRound;
+use App\Livewire\VolunteerPicker;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,6 +25,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Game routes
+Route::get('/pick', VolunteerPicker::class)->name('volunteer.pick');
+
 Route::get('/game/new', function () {
     $gameService = app(\App\Services\GameService::class);
     $game = $gameService->createGame();

@@ -2,6 +2,11 @@
 
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import confetti from 'canvas-confetti';
+
+// Make confetti available globally for Alpine.js
+window.confetti = confetti;
+
 
 // Configure Laravel Echo
 window.Pusher = Pusher;
@@ -19,8 +24,6 @@ import './game-timer.js';
 import './game-animations.js';
 
 // Alpine.js is included via Livewire
-
-console.log('Laravel Jeopardy Game initialized');
 
 // Join game channel for real-time updates
 if (window.gameId) {
