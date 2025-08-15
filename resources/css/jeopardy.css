@@ -233,31 +233,6 @@
     color: white;
 }
 
-/* Keyboard Shortcut Display */
-.keyboard-help {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    z-index: 999;
-}
-
-.keyboard-help-item {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
-}
-
-.keyboard-help-key {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 0.125rem 0.5rem;
-    border-radius: 0.25rem;
-    font-family: monospace;
-}
-
 /* Final Scores */
 .final-scores {
     background: linear-gradient(45deg, var(--jeopardy-blue), var(--jeopardy-dark-blue));

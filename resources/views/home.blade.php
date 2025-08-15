@@ -16,10 +16,10 @@
             <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
         </div>
     </div>
-    
+
     <div class="relative z-10 text-center px-4" x-data="{ showContent: false }" x-init="setTimeout(() => showContent = true, 100)">
         <!-- Logo Animation -->
-        <div x-show="showContent" 
+        <div x-show="showContent"
              x-transition:enter="transition ease-out duration-1500 transform"
              x-transition:enter-start="opacity-0 scale-90"
              x-transition:enter-end="opacity-100 scale-100">
@@ -39,29 +39,35 @@
                 JEOPARDY
             </h2>
         </div>
-        
+
         <div class="mt-20" x-show="showContent"
              x-transition:enter="transition ease-out duration-1000 delay-800"
              x-transition:enter-start="opacity-0 translate-y-10"
              x-transition:enter-end="opacity-100 translate-y-0">
-            
-            <!-- Start Game Button - Simplified -->
-            <a href="{{ route('game.new') }}" 
-               class="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-6 px-12 rounded-xl text-2xl transition-all transform hover:scale-105 shadow-2xl">
-                Start New Game
-            </a>
-            
+
+            <div class="flex gap-x-4 min-w-xl">
+                <a href="{{ route('game.new') }}"
+                   class="w-full text-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-6 rounded-xl text-2xl transition-all transform hover:scale-105 shadow-2xl">
+                    Start New Game
+                </a>
+
+                <a href="{{ route('volunteer.pick') }}"
+                   class="w-full text-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-6 rounded-xl text-2xl transition-all transform hover:scale-105 shadow-2xl">
+                    Build Teams
+                </a>
+            </div>
+
             @php
                 $latestGame = \App\Models\Game::latest()->first();
             @endphp
-            
+
             @if($latestGame && $latestGame->status !== 'finished')
                 <div class="mt-8"
                      x-show="showContent"
                      x-transition:enter="transition ease-out duration-1000 delay-1000"
                      x-transition:enter-start="opacity-0"
                      x-transition:enter-end="opacity-100">
-                    <a href="{{ route('game.board', ['gameId' => $latestGame->id]) }}" 
+                    <a href="{{ route('game.board', ['gameId' => $latestGame->id]) }}"
                        class="inline-flex items-center gap-3 text-white/70 hover:text-white font-medium text-xl transition-all">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
@@ -72,14 +78,14 @@
                 </div>
             @endif
         </div>
-        
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-sm opacity-50"
-             x-show="showContent"
-             x-transition:enter="transition ease-out duration-1000 delay-1200"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-50">
-            <p class="text-white/50">Laravel Live Denmark</p>
-        </div>
+    </div>
+
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-sm opacity-50"
+         x-show="showContent"
+         x-transition:enter="transition ease-out duration-1000 delay-1200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-50">
+        <p class="text-white/50">Made with ❤ and 🤖 for Laravel Live Denmark</p>
     </div>
 </body>
 </html>

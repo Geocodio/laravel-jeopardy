@@ -137,19 +137,6 @@
                 </div>
             </div>
 
-            <!-- Host Controls -->
-            @if($game->status === 'main_game')
-                <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40">
-                    <button
-                        wire:click="startLightningRound"
-                        class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg backdrop-blur-xl">
-                        <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                        Lightning Round
-                    </button>
-                </div>
-            @endif
         </div>
 
         <!-- Clue Display Modal -->

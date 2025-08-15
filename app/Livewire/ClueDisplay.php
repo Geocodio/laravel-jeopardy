@@ -50,9 +50,10 @@ class ClueDisplay extends Component
     {
         $this->clue = Clue::with(['category', 'category.game.teams'])->findOrFail($clueId);
         $this->isDailyDouble = $this->clue->is_daily_double;
-        $this->timeRemaining = $this->isDailyDouble ? 0 : 30;
+        $this->timeRemaining = 30;
         $this->availableTeams = $this->clue->category->game->teams;
 
+        // Don't start timer for Daily Double - wait for wager
         if (! $this->isDailyDouble) {
             $this->startTimer();
         }
@@ -109,6 +110,8 @@ class ClueDisplay extends Component
                 $this->wagerAmount,
                 true
             );
+            // Mark Daily Double clue as answered
+            $this->clue->update(['is_answered' => true]);
         } else {
             $this->scoringService->recordAnswer(
                 $this->clue->id,
@@ -117,14 +120,18 @@ class ClueDisplay extends Component
             );
         }
 
+        // Update current team - they keep control
+        $this->clue->category->game->update(['current_team_id' => $this->buzzerTeam->id]);
+
         $this->dispatch('play-sound', sound: 'correct');
         $this->dispatch('score-updated',
             teamId: $this->buzzerTeam->id,
             points: $pointsAwarded,
             correct: true
         );
+        $this->dispatch('team-keeps-control', teamId: $this->buzzerTeam->id);
         $this->dispatch('clue-answered', clueId: $this->clue->id);
-        $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection']);
+        $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount']);
     }
 
     public function markIncorrect()
@@ -141,13 +148,15 @@ class ClueDisplay extends Component
                 $this->wagerAmount,
                 false
             );
+            // Mark Daily Double clue as answered
+            $this->clue->update(['is_answered' => true]);
             $this->dispatch('score-updated',
                 teamId: $this->buzzerTeam->id,
                 points: -$pointsDeducted,
                 correct: false
             );
             $this->dispatch('clue-answered', clueId: $this->clue->id);
-            $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection']);
+            $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount']);
         } else {
             // Deduct points but allow other teams to buzz
             $this->scoringService->deductPoints(
@@ -160,6 +169,14 @@ class ClueDisplay extends Component
                 points: -$pointsDeducted,
                 correct: false
             );
+
+            // Check if this was the controlling team
+            $game = $this->clue->category->game;
+            if ($game->current_team_id == $this->buzzerTeam->id) {
+                // Controlling team got it wrong, open buzzers for everyone
+                $game->update(['current_team_id' => null]);
+                $this->dispatch('team-lost-control', teamId: $this->buzzerTeam->id);
+            }
 
             $this->buzzerService->lockoutTeam($this->buzzerTeam->id);
             $this->buzzerTeam = null;
@@ -181,6 +198,8 @@ class ClueDisplay extends Component
     public function setWager($amount)
     {
         $this->wagerAmount = max(5, min($amount, 2000));
+        // Start timer after wager is set
+        $this->timeRemaining = 30;
         $this->startTimer();
     }
 
@@ -210,6 +229,47 @@ class ClueDisplay extends Component
         }
 
         $this->dispatch('buzzer-accepted', teamId: $teamId);
+    }
+
+    // Listen for events from HostControl
+    #[On('remote-clue-selected')]
+    public function handleRemoteClueSelected($clueId)
+    {
+        $this->loadClue($clueId);
+    }
+
+    #[On('daily-double-wager-set')]
+    public function handleDailyDoubleWagerSet($teamId, $wager)
+    {
+        $this->buzzerTeam = Team::find($teamId);
+        $this->wagerAmount = $wager;
+        $this->timeRemaining = 30;
+        $this->startTimer();
+    }
+
+    #[On('answer-judged')]
+    public function handleAnswerJudged($clueId, $teamId, $correct, $points)
+    {
+        // Update local state when host judges answer
+        if ($this->clue && $this->clue->id == $clueId) {
+            $this->dispatch('clue-answered', clueId: $clueId);
+            $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount']);
+        }
+    }
+
+    #[On('clue-closed')]
+    public function handleClueClosed()
+    {
+        $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount']);
+    }
+
+    #[On('team-selected')]
+    public function handleTeamSelected($teamId)
+    {
+        // Update current team when host selects
+        if (!$this->buzzerTeam && $this->clue && !$this->clue->is_daily_double) {
+            $this->buzzerTeam = Team::find($teamId);
+        }
     }
 
     public function render()

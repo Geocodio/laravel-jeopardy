@@ -80,6 +80,22 @@ class TeamScoreboard extends Component
         $this->activeTeamId = null;
     }
 
+    #[On('score-adjusted')]
+    public function handleScoreAdjustment($teamId, $newScore)
+    {
+        // Refresh scores when host manually adjusts
+        $this->refreshScores();
+        
+        // Show animation for adjusted score
+        $this->recentScoreChanges[$teamId] = [
+            'points' => 0, // Don't show specific amount, just trigger animation
+            'correct' => true,
+            'timestamp' => now()->timestamp,
+        ];
+        
+        $this->dispatch('clear-score-animation-js', teamId: $teamId);
+    }
+
     public function render()
     {
         return view('livewire.team-scoreboard');

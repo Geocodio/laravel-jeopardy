@@ -165,81 +165,9 @@
                         </div>
                     @endif
                     
-                    <!-- Manual Team Selection -->
-                    @if($showManualTeamSelection && !$buzzerTeam)
-                        <div class="mb-6 p-4 bg-black/30 rounded-xl"
-                             x-show="showContent"
-                             x-transition:enter="transition ease-out duration-500"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100">
-                            <h3 class="text-xl font-bold text-yellow-400 mb-4 text-center">Select Team Manually:</h3>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                @foreach($availableTeams as $team)
-                                    <button 
-                                        wire:click="selectTeamManually({{ $team->id }})"
-                                        class="px-4 py-3 rounded-lg font-bold text-white transition-all transform hover:scale-105 shadow-lg"
-                                        style="background-color: {{ $team->color_hex }}; border: 2px solid rgba(255,255,255,0.3)">
-                                        {{ $team->name }}
-                                    </button>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-                    
-                    <!-- Host Controls -->
-                    <div class="flex flex-wrap justify-center gap-4 mt-8"
-                         x-show="showContent"
-                         x-transition:enter="transition ease-out duration-700 delay-800"
-                         x-transition:enter-start="opacity-0 translate-y-4"
-                         x-transition:enter-end="opacity-100 translate-y-0">
-                        @if($buzzerTeam)
-                            <button 
-                                wire:click="markCorrect" 
-                                class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                Correct (+${{ number_format($clue->value) }})
-                            </button>
-                            <button 
-                                wire:click="markIncorrect" 
-                                class="group relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                                Incorrect (-${{ number_format($clue->value) }})
-                            </button>
-                        @else
-                            <button 
-                                wire:click="toggleManualTeamSelection" 
-                                class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                </svg>
-                                Manual Select Team
-                            </button>
-                        @endif
-                        
-                        @if(!$showingAnswer)
-                            <button 
-                                wire:click="showAnswer" 
-                                class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                                Show Answer
-                            </button>
-                        @endif
-                        
-                        <button 
-                            wire:click="skipClue" 
-                            class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-lg">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
-                            </svg>
-                            Skip
-                        </button>
+                    <!-- Waiting for Host Control -->
+                    <div class="text-center mt-8 text-xl text-gray-300">
+                        <p>Waiting for host control...</p>
                     </div>
                 </div>
             </div>

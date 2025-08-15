@@ -31,9 +31,22 @@ class BuzzerListener extends Component
     #[On('lightning-question-shown')]
     public function enableBuzzers()
     {
-        $this->isListening = true;
+        // Only enable buzzers if there's no controlling team (or for lightning round)
+        if ($this->game && $this->game->current_team_id) {
+            $this->isListening = false;
+        } else {
+            $this->isListening = true;
+        }
         $this->lockedOut = [];
         $this->buzzerService->resetAllBuzzers();
+    }
+
+    #[On('open-buzzers')]
+    public function openBuzzers()
+    {
+        // Called when host opens buzzers for all teams
+        $this->isListening = true;
+        $this->lockedOut = [];
     }
 
     #[On('clue-answered')]

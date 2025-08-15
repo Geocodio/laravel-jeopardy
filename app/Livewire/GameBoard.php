@@ -81,6 +81,9 @@ class GameBoard extends Component
         $this->gameService->transitionToLightningRound($this->game->id);
         $this->game->refresh();
         $this->dispatch('lightning-round-started');
+        
+        // Redirect to lightning round page
+        return redirect()->route('game.lightning', ['gameId' => $this->game->id]);
     }
 
     public function endGame()
@@ -94,6 +97,33 @@ class GameBoard extends Component
     {
         $this->game->refresh();
         $this->categories = $this->game->categories->sortBy('position');
+    }
+
+    // Listen for events from HostControl
+    #[On('clue-selected')]
+    public function handleHostClueSelected($clueId)
+    {
+        $this->selectClue($clueId);
+    }
+
+    #[On('clue-closed')]
+    public function handleHostClueClosed()
+    {
+        $this->returnToBoard();
+    }
+
+    #[On('clue-skipped')]
+    public function handleHostClueSkipped($clueId)
+    {
+        $this->refreshGame();
+    }
+
+    #[On('team-selected')]
+    public function handleHostTeamSelected($teamId)
+    {
+        // Update game state with current team
+        $this->game->update(['current_team_id' => $teamId]);
+        $this->refreshGame();
     }
 
     public function render()

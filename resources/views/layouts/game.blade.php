@@ -29,47 +29,6 @@
         Livewire.on('play-sound', ({sound}) => {
             window.playSound(sound);
         });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            // Only handle shortcuts when not typing in an input
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                return;
-            }
-
-            switch(e.key.toLowerCase()) {
-                case ' ':
-                    e.preventDefault();
-                    Livewire.dispatch('keyboard-space');
-                    break;
-                case 'c':
-                    e.preventDefault();
-                    Livewire.dispatch('keyboard-correct');
-                    break;
-                case 'x':
-                    e.preventDefault();
-                    Livewire.dispatch('keyboard-incorrect');
-                    break;
-                case 'n':
-                    e.preventDefault();
-                    Livewire.dispatch('keyboard-next');
-                    break;
-                case 'r':
-                    e.preventDefault();
-                    Livewire.dispatch('keyboard-reset');
-                    break;
-                case 'escape':
-                    e.preventDefault();
-                    Livewire.dispatch('keyboard-escape');
-                    break;
-                case 'd':
-                    if (e.ctrlKey || e.metaKey) {
-                        e.preventDefault();
-                        Livewire.dispatch('keyboard-daily-double');
-                    }
-                    break;
-            }
-        });
     </script>
 </body>
 </html>

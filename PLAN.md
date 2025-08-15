@@ -327,16 +327,6 @@ Events:
 
 ### Host Controls
 
-#### Keyboard Shortcuts
-- `Space` - Start/Stop timer
-- `C` - Mark answer correct
-- `X` - Mark answer incorrect
-- `N` - Next question (lightning round)
-- `R` - Reset buzzers
-- `Esc` - Return to game board
-- `D` - Trigger Daily Double (testing)
-- `+/-` - Manual score adjustment
-
 #### Mouse Controls
 - Click on clue to reveal
 - Click host buttons for scoring
