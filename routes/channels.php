@@ -15,9 +15,10 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-// Game channel for real-time updates
+// Game private channel for real-time updates
 Broadcast::channel('game.{gameId}', function ($user, $gameId) {
     // Since running locally, allow all connections
+    // Private channels just need to return true/false
     return true;
 });
 

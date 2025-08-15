@@ -2,24 +2,31 @@
 
 namespace App\Events;
 
+use App\Models\Clue;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ClueRevealed
+class ClueRevealed implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $gameId;
+    public $clueId;
+    public $clue;
 
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct($gameId, $clueId)
     {
-        //
+        $this->gameId = $gameId;
+        $this->clueId = $clueId;
+        $this->clue = Clue::with('category')->find($clueId);
     }
 
     /**
@@ -30,7 +37,21 @@ class ClueRevealed
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('game.' . $this->gameId),
+        ];
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'clueId' => $this->clueId,
+            'clue' => $this->clue,
+            'gameId' => $this->gameId,
         ];
     }
 }

@@ -231,36 +231,47 @@ class ClueDisplay extends Component
         $this->dispatch('buzzer-accepted', teamId: $teamId);
     }
 
-    // Listen for events from HostControl
-    #[On('remote-clue-selected')]
-    public function handleRemoteClueSelected($clueId)
+    // Listen for broadcast events
+    #[On('clue-revealed')]
+    public function handleClueRevealed($clueId)
     {
         $this->loadClue($clueId);
     }
 
-    #[On('daily-double-wager-set')]
-    public function handleDailyDoubleWagerSet($teamId, $wager)
+    #[On('game-state-changed')]
+    public function handleGameStateChanged($state, $data = [])
     {
-        $this->buzzerTeam = Team::find($teamId);
-        $this->wagerAmount = $wager;
-        $this->timeRemaining = 30;
-        $this->startTimer();
-    }
-
-    #[On('answer-judged')]
-    public function handleAnswerJudged($clueId, $teamId, $correct, $points)
-    {
-        // Update local state when host judges answer
-        if ($this->clue && $this->clue->id == $clueId) {
-            $this->dispatch('clue-answered', clueId: $clueId);
-            $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount']);
+        if ($state === 'answer-judged' && isset($data['clueId'])) {
+            // Update local state when host judges answer
+            if ($this->clue && $this->clue->id == $data['clueId']) {
+                $this->timerRunning = false;
+                $this->dispatch('clue-answered', clueId: $data['clueId']);
+                // Don't reset immediately - let GameBoard handle the modal closing
+            }
+        } elseif ($state === 'clue-closed') {
+            $this->timerRunning = false;
+            $this->reset(['clue', 'buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount']);
+        } elseif ($state === 'team-selected' && isset($data['teamId'])) {
+            // Update current team when host selects
+            if (!$this->buzzerTeam && $this->clue && !$this->clue->is_daily_double) {
+                $this->buzzerTeam = Team::find($data['teamId']);
+                $this->timerRunning = false;
+            }
+        } elseif ($state === 'daily-double-wager-set') {
+            if (isset($data['teamId']) && isset($data['wager'])) {
+                $this->buzzerTeam = Team::find($data['teamId']);
+                $this->wagerAmount = $data['wager'];
+                $this->timeRemaining = 30;
+                $this->startTimer();
+            }
         }
     }
 
-    #[On('clue-closed')]
-    public function handleClueClosed()
+    // Keep remote control events for backwards compatibility
+    #[On('remote-clue-selected')]
+    public function handleRemoteClueSelected($clueId)
     {
-        $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount']);
+        $this->loadClue($clueId);
     }
 
     #[On('team-selected')]
@@ -269,6 +280,7 @@ class ClueDisplay extends Component
         // Update current team when host selects
         if (!$this->buzzerTeam && $this->clue && !$this->clue->is_daily_double) {
             $this->buzzerTeam = Team::find($teamId);
+            $this->timerRunning = false;
         }
     }
 

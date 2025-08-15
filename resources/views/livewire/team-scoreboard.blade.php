@@ -18,7 +18,7 @@
             <!-- Team Card -->
             <div
                 class="relative backdrop-blur-lg rounded-2xl p-6 border-2 transition-all duration-500 transform
-                    {{ $isActive ? 'bg-white/20 scale-110 shadow-2xl' : 'bg-black/30 hover:bg-black/40 hover:scale-105' }}
+                    {{ $isActive ? 'bg-black/50 scale-110 shadow-2xl' : 'bg-black/30 hover:bg-black/40 hover:scale-105' }}
                     {{ $team['score'] < 0 ? 'border-red-500/50' : 'border-white/20' }}"
                 style="border-color: {{ $isActive ? $team['color_hex'] : '' }}">
 
@@ -27,11 +27,6 @@
                     class="text-lg font-bold mb-3 tracking-wider uppercase transition-all duration-300"
                     style="color: {{ $team['color_hex'] }}">
                     {{ $team['name'] }}
-
-                    <!-- Active Indicator -->
-                    @if($isActive)
-                        <span class="ml-2 inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                    @endif
                 </h3>
 
                 <!-- Score Display -->

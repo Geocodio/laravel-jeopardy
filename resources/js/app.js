@@ -1,12 +1,9 @@
-// Laravel Jeopardy Game Application
-
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import confetti from 'canvas-confetti';
 
 // Make confetti available globally for Alpine.js
 window.confetti = confetti;
-
 
 // Configure Laravel Echo
 window.Pusher = Pusher;
@@ -23,20 +20,9 @@ import './buzzer-handler.js';
 import './game-timer.js';
 import './game-animations.js';
 
-// Alpine.js is included via Livewire
-
-// Join game channel for real-time updates
+// Subscribe to private game channel for real-time updates
 if (window.gameId) {
-    window.Echo.join(`game.${window.gameId}`)
-        .here((users) => {
-            console.log('Users in game:', users);
-        })
-        .joining((user) => {
-            console.log('User joined:', user);
-        })
-        .leaving((user) => {
-            console.log('User left:', user);
-        })
+    window.Echo.private(`game.${window.gameId}`)
         .listen('BuzzerPressed', (e) => {
             console.log('Buzzer pressed:', e);
             Livewire.dispatch('buzzer-webhook-received', {
@@ -46,6 +32,21 @@ if (window.gameId) {
         })
         .listen('ScoreUpdated', (e) => {
             console.log('Score updated:', e);
-            Livewire.dispatch('score-updated');
+            // Dispatch to all Livewire components listening for this event
+            Livewire.dispatch('score-updated', e);
+        })
+        .listen('ClueRevealed', (e) => {
+            console.log('Clue revealed:', e);
+            Livewire.dispatch('clue-revealed', {
+                clueId: e.clueId
+            });
+        })
+        .listen('GameStateChanged', (e) => {
+            console.log('Game state changed:', e);
+            Livewire.dispatch('game-state-changed', e);
+        })
+        .listen('DailyDoubleTriggered', (e) => {
+            console.log('Daily double triggered:', e);
+            Livewire.dispatch('daily-double-triggered', e);
         });
 }

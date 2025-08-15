@@ -67,11 +67,20 @@ class HostControl extends Component
     public function selectCurrentTeam($teamId)
     {
         $this->currentTeam = Team::find($teamId);
-        $this->game->update(['current_team_id' => $teamId]);
         
-        // Broadcast to main display
-        $this->dispatch('team-selected', teamId: $teamId)->to(GameBoard::class);
-        $this->dispatch('team-selected', teamId: $teamId)->to(ClueDisplay::class);
+        // Update the database and ensure it's saved
+        $this->game->current_team_id = $teamId;
+        $this->game->save();
+        
+        // Verify the save worked
+        \Log::info('Team selected', [
+            'game_id' => $this->game->id,
+            'team_id' => $teamId,
+            'saved_team_id' => $this->game->fresh()->current_team_id
+        ]);
+        
+        // Broadcast team selection to all clients
+        broadcast(new \App\Events\GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
     }
 
     // Clue Control
@@ -93,7 +102,8 @@ class HostControl extends Component
             $this->showDailyDoubleWager = true;
             $this->dailyDoubleTeam = $this->currentTeam;
             $this->dailyDoubleWager = 0;
-            $this->dispatch('play-sound', sound: 'daily-double')->to(GameBoard::class);
+            // Broadcast daily double sound event
+            broadcast(new \App\Events\DailyDoubleTriggered($this->game->id, $clueId));
         } else {
             $this->timerRunning = true;
         }
@@ -102,8 +112,10 @@ class HostControl extends Component
         $clue->update(['is_revealed' => true]);
         $this->game->update(['current_clue_id' => $clueId]);
         
-        // Broadcast to main display
-        $this->dispatch('clue-selected', clueId: $clueId)->to(GameBoard::class);
+        // Broadcast the ClueRevealed event to all connected clients
+        broadcast(new \App\Events\ClueRevealed($this->game->id, $clueId));
+        
+        // Local dispatch for components on this page
         $this->dispatch('remote-clue-selected', clueId: $clueId)->to(ClueDisplay::class);
     }
 
@@ -114,11 +126,11 @@ class HostControl extends Component
         $this->showDailyDoubleWager = false;
         $this->timerRunning = true;
         
-        // Broadcast wager to main display
-        $this->dispatch('daily-double-wager-set', 
-            teamId: $this->dailyDoubleTeam->id,
-            wager: $this->dailyDoubleWager
-        )->to(ClueDisplay::class);
+        // Broadcast wager to all clients
+        broadcast(new \App\Events\GameStateChanged($this->game->id, 'daily-double-wager-set', [
+            'teamId' => $this->dailyDoubleTeam->id,
+            'wager' => $this->dailyDoubleWager
+        ]));
     }
 
     // Answer Control
@@ -147,27 +159,47 @@ class HostControl extends Component
         
         // Update current team (they keep control)
         $this->currentTeam = $team;
-        $this->game->update(['current_team_id' => $team->id]);
+        $this->game->current_team_id = $team->id;
+        $this->game->save();
         
         // Mark clue as answered
         $this->selectedClue->update(['is_answered' => true]);
         
-        // Broadcast events
-        $this->dispatch('answer-judged', 
-            clueId: $this->selectedClue->id,
-            teamId: $team->id,
-            correct: true,
-            points: $points
-        )->to(ClueDisplay::class);
+        // Refresh team to get updated score
+        $team->refresh();
         
-        $this->dispatch('score-updated', 
-            teamId: $team->id,
-            points: $points,
-            correct: true
-        )->to(TeamScoreboard::class);
+        // First broadcast team selection so ClueDisplay knows who answered
+        broadcast(new \App\Events\GameStateChanged($this->game->id, 'team-selected', [
+            'teamId' => $team->id
+        ]));
         
-        $this->dispatch('play-sound', sound: 'correct')->to(GameBoard::class);
+        // Broadcast score update
+        $event = new \App\Events\ScoreUpdated(
+            $this->game->id,
+            $team->id,
+            $team->score,
+            $points,
+            true
+        );
         
+        \Log::info('Broadcasting ScoreUpdated event', [
+            'game_id' => $this->game->id,
+            'team_id' => $team->id,
+            'points' => $points,
+            'new_score' => $team->score
+        ]);
+        
+        broadcast($event);
+        
+        // Broadcast game state for answer judged
+        broadcast(new \App\Events\GameStateChanged($this->game->id, 'answer-judged', [
+            'clueId' => $this->selectedClue->id,
+            'teamId' => $team->id,
+            'correct' => true,
+            'points' => $points
+        ]));
+        
+        // Close the clue modal after a short delay
         $this->closeClue();
     }
 
@@ -194,25 +226,29 @@ class HostControl extends Component
         // Open buzzers for other teams (unless Daily Double)
         if (!$this->selectedClue->is_daily_double) {
             $this->currentTeam = null;
-            $this->game->update(['current_team_id' => null]);
-            $this->dispatch('open-buzzers')->to(BuzzerListener::class);
+            $this->game->current_team_id = null;
+            $this->game->save();
         }
         
-        // Broadcast events
-        $this->dispatch('answer-judged', 
-            clueId: $this->selectedClue->id,
-            teamId: $team->id,
-            correct: false,
-            points: -$points
-        )->to(ClueDisplay::class);
+        // Refresh team to get updated score
+        $team->refresh();
         
-        $this->dispatch('score-updated', 
-            teamId: $team->id,
-            points: -$points,
-            correct: false
-        )->to(TeamScoreboard::class);
+        // Broadcast score update
+        broadcast(new \App\Events\ScoreUpdated(
+            $this->game->id,
+            $team->id,
+            $team->score,
+            -$points,
+            false
+        ));
         
-        $this->dispatch('play-sound', sound: 'incorrect')->to(GameBoard::class);
+        // Broadcast game state for answer judged
+        broadcast(new \App\Events\GameStateChanged($this->game->id, 'answer-judged', [
+            'clueId' => $this->selectedClue->id,
+            'teamId' => $team->id,
+            'correct' => false,
+            'points' => -$points
+        ]));
         
         if ($this->selectedClue->is_daily_double) {
             $this->closeClue();
@@ -223,7 +259,7 @@ class HostControl extends Component
     {
         if ($this->selectedClue) {
             $this->selectedClue->update(['is_answered' => true]);
-            $this->dispatch('clue-skipped', clueId: $this->selectedClue->id)->to(GameBoard::class);
+            broadcast(new \App\Events\GameStateChanged($this->game->id, 'clue-skipped', ['clueId' => $this->selectedClue->id]));
             $this->closeClue();
         }
     }
@@ -240,9 +276,8 @@ class HostControl extends Component
         
         $this->game->update(['current_clue_id' => null]);
         
-        // Broadcast to main display
-        $this->dispatch('clue-closed')->to(GameBoard::class);
-        $this->dispatch('clue-closed')->to(ClueDisplay::class);
+        // Broadcast clue closed to all clients
+        broadcast(new \App\Events\GameStateChanged($this->game->id, 'clue-closed'));
         
         $this->refreshGame();
     }

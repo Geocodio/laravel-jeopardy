@@ -99,30 +99,33 @@ class GameBoard extends Component
         $this->categories = $this->game->categories->sortBy('position');
     }
 
-    // Listen for events from HostControl
-    #[On('clue-selected')]
-    public function handleHostClueSelected($clueId)
+    // Listen for broadcast events from HostControl
+    #[On('clue-revealed')]
+    public function handleClueRevealed($clueId)
     {
         $this->selectClue($clueId);
     }
 
-    #[On('clue-closed')]
-    public function handleHostClueClosed()
+    #[On('game-state-changed')]
+    public function handleGameStateChanged($state, $data = [])
     {
-        $this->returnToBoard();
+        if ($state === 'clue-closed') {
+            $this->returnToBoard();
+        } elseif ($state === 'clue-skipped') {
+            $this->refreshGame();
+        } elseif ($state === 'team-selected') {
+            $this->game->update(['current_team_id' => $data['teamId'] ?? null]);
+            $this->refreshGame();
+        } elseif ($state === 'answer-judged') {
+            // Refresh the game board when an answer is judged
+            $this->refreshGame();
+        }
     }
 
-    #[On('clue-skipped')]
-    public function handleHostClueSkipped($clueId)
+    #[On('score-updated')]
+    public function handleScoreUpdated()
     {
-        $this->refreshGame();
-    }
-
-    #[On('team-selected')]
-    public function handleHostTeamSelected($teamId)
-    {
-        // Update game state with current team
-        $this->game->update(['current_team_id' => $teamId]);
+        // Refresh the game when scores are updated
         $this->refreshGame();
     }
 

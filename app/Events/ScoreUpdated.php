@@ -2,24 +2,35 @@
 
 namespace App\Events;
 
+use App\Models\Team;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ScoreUpdated
+class ScoreUpdated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $gameId;
+    public $teamId;
+    public $newScore;
+    public $points;
+    public $correct;
 
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct($gameId, $teamId, $newScore, $points = 0, $correct = null)
     {
-        //
+        $this->gameId = $gameId;
+        $this->teamId = $teamId;
+        $this->newScore = $newScore;
+        $this->points = $points;
+        $this->correct = $correct;
     }
 
     /**
@@ -30,7 +41,23 @@ class ScoreUpdated
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('game.' . $this->gameId),
+        ];
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'gameId' => $this->gameId,
+            'teamId' => $this->teamId,
+            'newScore' => $this->newScore,
+            'points' => $this->points,
+            'correct' => $this->correct,
         ];
     }
 }
