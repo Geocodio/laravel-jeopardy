@@ -1,32 +1,30 @@
 <div class="h-screen overflow-y-auto bg-gradient-to-br from-slate-900 to-slate-800 text-white">
     @if($game)
-        <div class="container mx-auto px-4 py-4">
-            <!-- Header -->
-            <div class="bg-slate-800/50 backdrop-blur-lg rounded-xl p-4 mb-4 border border-slate-700">
-                <div class="flex justify-between items-center">
-                    <h1 class="text-2xl font-bold text-yellow-400">Host Control Panel</h1>
-                    <div class="flex gap-4 items-center">
-                        <span class="text-sm text-slate-400">Game ID: {{ $game->id }}</span>
-                        @if($game->status === 'main_game')
-                            <button wire:click="startLightningRound" 
-                                class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors">
-                                ⚡ Start Lightning Round
-                            </button>
-                        @endif
-                    </div>
-                </div>
+        <div class="container mx-auto px-4 py-4 relative">
+            <!-- Game ID in corner -->
+            <div class="absolute top-4 left-4 text-xs text-slate-500 bg-slate-800/50 backdrop-blur px-2 py-1 rounded">
+                Game ID: {{ $game->id }}
             </div>
+            
+            <!-- Lightning Round Button -->
+            @if($game->status === 'main_game')
+                <div class="flex justify-end mb-4">
+                    <button wire:click="startLightningRound" 
+                        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors">
+                        ⚡ Start Lightning Round
+                    </button>
+                </div>
+            @endif
 
             <!-- Main Content Grid - Optimized for iPad Pro -->
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <!-- Left Column: Team Controls -->
-                <div class="space-y-6">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <!-- Left Column: Team Controls (smaller) -->
+                <div class="xl:col-span-1 space-y-6">
                     <!-- Combined Team Control Panel -->
-                    <div class="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-                        <h2 class="text-2xl font-bold mb-4 text-yellow-400">Team Control</h2>
-                        <div class="grid grid-cols-1 gap-4">
+                    <div class="bg-slate-800/50 backdrop-blur-lg rounded-xl p-4 border border-slate-700">
+                        <div class="grid grid-cols-1 gap-3">
                             @foreach($teams as $team)
-                                <div class="flex items-center gap-4 p-5 rounded-lg border-2 transition-all
+                                <div class="flex items-center gap-3 p-3 rounded-lg border-2 transition-all
                                     {{ $currentTeam && $currentTeam->id === $team->id 
                                         ? 'border-yellow-400' 
                                         : 'border-slate-600' }}"
@@ -37,29 +35,27 @@
                                     
                                     <!-- Team Name with Glow Effect -->
                                     <div class="flex-1">
-                                        <div class="text-2xl font-bold"
-                                             style="color: {{ $team->color_hex }};
-                                                    text-shadow: 0 0 20px {{ $team->color_hex }};">
+                                        <div class="text-lg font-bold text-yellow-400">
                                             {{ $team->name }}
                                             @if($currentTeam && $currentTeam->id === $team->id)
-                                                <span class="ml-2 text-yellow-400" style="text-shadow: 0 0 15px gold;">👑</span>
+                                                <span class="ml-1">👑</span>
                                             @endif
                                         </div>
-                                        <div class="text-lg text-gray-300 mt-1">
+                                        <div class="text-sm text-gray-300">
                                             Score: <span class="font-bold text-green-400">${{ number_format($team->score) }}</span>
                                         </div>
                                     </div>
                                     
                                     <!-- Control Buttons -->
-                                    <div class="flex gap-3">
+                                    <div class="flex gap-2">
                                         <!-- Select as Current Team -->
                                         <button wire:click="selectCurrentTeam({{ $team->id }})"
-                                            class="px-6 py-6 rounded-lg font-bold text-xl transition-all hover:scale-105
+                                            class="px-3 py-3 rounded-lg font-bold transition-all hover:scale-105
                                                 {{ $currentTeam && $currentTeam->id === $team->id 
                                                     ? 'bg-yellow-500 text-slate-900' 
                                                     : 'bg-slate-700 hover:bg-slate-600 text-white' }}"
                                             title="Select as current team">
-                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
@@ -67,7 +63,7 @@
                                         
                                         <!-- Manual Buzzer -->
                                         <button wire:click="triggerBuzzer({{ $team->id }})"
-                                            class="px-6 py-6 rounded-lg font-bold text-xl text-white transition-all hover:scale-105"
+                                            class="px-3 py-3 rounded-lg font-bold text-white transition-all hover:scale-105"
                                             style="background-color: {{ $team->color_hex }};
                                                    box-shadow: 0 4px 15px {{ $team->color_hex }}50;"
                                             title="Trigger buzzer for {{ $team->name }}">
@@ -80,21 +76,19 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Game Board -->
-                <div class="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-                    <h2 class="text-2xl font-bold mb-4 text-yellow-400">Game Board</h2>
-                    
+                <!-- Right Column: Game Board (bigger) -->
+                <div class="xl:col-span-2 bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
                     <!-- All 6 Categories in One Row -->
-                    <div class="grid grid-cols-6 gap-2 mb-3">
+                    <div class="grid grid-cols-6 gap-3 mb-4">
                         @foreach($categories as $category)
-                            <div class="text-sm font-bold text-center p-3 bg-blue-800/50 rounded">
-                                {{ Str::limit($category->name, 12) }}
+                            <div class="text-base font-bold text-center p-4 bg-blue-800/50 rounded text-yellow-400">
+                                {{ Str::limit($category->name, 15) }}
                             </div>
                         @endforeach
                     </div>
                     
                     <!-- All Clues in 6 Columns -->
-                    <div class="grid grid-cols-6 gap-2">
+                    <div class="grid grid-cols-6 gap-3">
                         @foreach([100, 200, 300, 400] as $value)
                             @foreach($categories as $category)
                                 @php
@@ -104,13 +98,13 @@
                                     <button 
                                         wire:click="selectClue({{ $clue->id }})"
                                         @if($clue->is_answered) disabled @endif
-                                        class="h-20 rounded-lg flex items-center justify-center text-lg font-bold transition-all
+                                        class="h-24 rounded-lg flex items-center justify-center text-2xl font-bold transition-all
                                             {{ $clue->is_answered 
                                                 ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed' 
                                                 : 'bg-blue-600 hover:bg-blue-700 cursor-pointer hover:scale-105' }}
                                             {{ $selectedClue && $selectedClue->id === $clue->id ? 'ring-4 ring-yellow-400' : '' }}">
                                         @if(!$clue->is_answered)
-                                            ${{ $value }}
+                                            <span class="text-yellow-400">${{ $value }}</span>
                                             @if($clue->is_daily_double)
                                                 <span class="ml-1 text-yellow-400">⭐</span>
                                             @endif
@@ -119,7 +113,7 @@
                                         @endif
                                     </button>
                                 @else
-                                    <div class="h-20 bg-gray-800/30 rounded-lg"></div>
+                                    <div class="h-24 bg-gray-800/30 rounded-lg"></div>
                                 @endif
                             @endforeach
                         @endforeach
@@ -246,7 +240,6 @@
 
             <!-- Score Control - Secondary Action at Bottom -->
             <div class="mt-6 bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-                <h2 class="text-2xl font-bold mb-4 text-yellow-400">Score Control (Manual Adjustment)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     @foreach($teams as $team)
                         <div class="flex items-center justify-between p-4 rounded-lg border border-slate-600 bg-slate-900/50">

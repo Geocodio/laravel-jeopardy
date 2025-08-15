@@ -217,17 +217,20 @@ class HostControl extends Component
         // Deduct points
         if ($this->selectedClue->is_daily_double) {
             $this->scoringService->handleDailyDouble($team->id, $this->dailyDoubleWager, false);
-            // Mark clue as answered for Daily Double
+            // Mark clue as answered for Daily Double (only one chance)
             $this->selectedClue->update(['is_answered' => true]);
         } else {
             $this->scoringService->deductPoints($team->id, $this->selectedClue->value);
         }
         
-        // Open buzzers for other teams (unless Daily Double)
+        // Clear current team to open buzzers for others (unless Daily Double)
         if (!$this->selectedClue->is_daily_double) {
             $this->currentTeam = null;
             $this->game->current_team_id = null;
             $this->game->save();
+            
+            // Resume timer with remaining time
+            broadcast(new \App\Events\GameStateChanged($this->game->id, 'resume-timer'));
         }
         
         // Refresh team to get updated score
@@ -242,17 +245,18 @@ class HostControl extends Component
             false
         ));
         
-        // Broadcast game state for answer judged
-        broadcast(new \App\Events\GameStateChanged($this->game->id, 'answer-judged', [
+        // Broadcast incorrect answer (but don't close clue for regular questions)
+        broadcast(new \App\Events\GameStateChanged($this->game->id, 'answer-incorrect', [
             'clueId' => $this->selectedClue->id,
             'teamId' => $team->id,
-            'correct' => false,
             'points' => -$points
         ]));
         
+        // Only close clue for Daily Double (they only get one chance)
         if ($this->selectedClue->is_daily_double) {
             $this->closeClue();
         }
+        // For regular clues, keep it open for other teams to buzz in
     }
 
     public function skipClue()

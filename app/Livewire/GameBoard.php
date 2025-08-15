@@ -117,8 +117,12 @@ class GameBoard extends Component
             $this->game->update(['current_team_id' => $data['teamId'] ?? null]);
             $this->refreshGame();
         } elseif ($state === 'answer-judged') {
-            // Refresh the game board when an answer is judged
+            // Answer was correct - refresh and close
             $this->refreshGame();
+        } elseif ($state === 'answer-incorrect') {
+            // Answer was incorrect - just refresh scores, keep clue open
+            $this->refreshGame();
+            // Don't close the modal - other teams can still buzz in
         }
     }
 
