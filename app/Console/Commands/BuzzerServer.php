@@ -21,60 +21,81 @@ class BuzzerServer extends Command
      */
     protected $description = 'Runs the buzzer server';
 
+    private array $buttonPins;
+
+    private array $ledPins;
+
+    private $buttonPinIds = [
+        17,
+        18,
+        24,
+        25,
+        5,
+    ];
+
+    private $ledPinIds = [
+        14,
+        15,
+        23,
+        20,
+        21,
+    ];
+
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $buttonPinIds = [
-            17,
-            18,
-            24,
-            25,
-            5
-        ];
-
-        $ledPinIds = [
-            14,
-            15,
-            23,
-            20,
-            21
-        ];
-
-        $buttonPins = [];
-        foreach ($buttonPinIds as $pin) {
-            $buttonPins[$pin] = PinService::pin($pin);
-            $buttonPins[$pin]->makeInput();
-        }
-
-        $ledPins = [];
-        foreach ($ledPinIds as $pin) {
-            $ledPins[$pin] = PinService::pin($pin);
-            $ledPins[$pin]->makeOutput();
-            $ledPins[$pin]->turnOn();
-        }
+        $this->init();
 
         while (true) {
-            foreach ($ledPins as $id => $pin) {
-	        echo "Turning on " . $id . "\n";
+            $this->checkButtons();
+            usleep(10000); // Sleep for 10ms
+        }
+    }
+
+    private function init(): void
+    {
+        $this->buttonPins = [];
+        foreach ($this->buttonPinIds as $pin) {
+            $this->buttonPins[$pin] = PinService::pin($pin);
+            $this->buttonPins[$pin]->makeInput();
+        }
+
+        $this->ledPins = [];
+        foreach ($this->ledPinIds as $pin) {
+            $this->ledPins[$pin] = PinService::pin($pin);
+            $this->ledPins[$pin]->makeOutput();
+            $this->ledPins[$pin]->turnOn();
+        }
+    }
+
+    private function loopLEDs(): void
+    {
+        while (true) {
+            foreach ($this->ledPins as $id => $pin) {
+                echo 'Turning on '.$id."\n";
                 $pin->turnOff();
                 sleep(1);
                 $pin->turnOn();
                 sleep(1);
             }
-            /*
-            $this->checkButtons($buttonPins);
-            usleep(10000); // Sleep for 10ms
-            */
         }
     }
 
-    private function checkButtons(array $buttonPins): void
+    private function checkButtons(): void
     {
-        foreach ($buttonPins as $id => $pin) {
+        foreach ($this->buttonPins as $id => $pin) {
             if ($pin->isOff()) {
-                $this->info("Button on pin {$id} is pressed.");
+                $index = array_search($id, $this->buttonPinIds, true);
+                $this->info("Button on pin {$id} is pressed. Index= . $index");
+
+                for ($i = 0; $i < 5; $i++) {
+                    $this->ledPins[$index]->turnOff();
+                    usleep(100000); // Sleep for 100ms
+                    $this->ledPins[$index]->turnOn();
+                    usleep(100000); // Sleep for 100ms
+                }
             }
         }
     }
