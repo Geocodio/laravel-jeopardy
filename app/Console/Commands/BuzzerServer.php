@@ -40,14 +40,14 @@ class BuzzerServer extends Command
 
         while (true) {
             $this->checkButtons($pins);
-            usleep(100000); // Sleep for 100ms
+            usleep(10000); // Sleep for 10ms
         }
     }
 
     private function checkButtons(array $pins): void
     {
         foreach ($pins as $id => $pin) {
-            if ($pin->isOn()) {
+            if ($pin->isOff()) {
                 $this->info("Button on pin {$id} is pressed.");
             }
         }
