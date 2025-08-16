@@ -52,13 +52,15 @@ class BuzzerServer extends Command
         foreach ($ledPinIds as $pin) {
             $ledPins[$pin] = PinService::pin($pin);
             $ledPins[$pin]->makeOutput();
+            $ledPins[$pin]->turnOn();
         }
 
         while (true) {
-            foreach ($ledPins as $pin) {
-                $pin->turnOn();
-                sleep(1);
+            foreach ($ledPins as $id => $pin) {
+	        echo "Turning on " . $id . "\n";
                 $pin->turnOff();
+                sleep(1);
+                $pin->turnOn();
                 sleep(1);
             }
             /*
