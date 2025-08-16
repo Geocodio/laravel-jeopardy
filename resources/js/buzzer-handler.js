@@ -65,7 +65,7 @@ class BuzzerHandler {
         }, duration);
     }
 
-    processBuzz(teamId, timestamp) {
+    processBuzz(teamId) {
         if (!this.isListening) {
             console.log(`Buzz rejected - not listening (Team ${teamId})`);
             return false;
@@ -88,7 +88,6 @@ class BuzzerHandler {
         // Emit buzzer event to Livewire
         Livewire.dispatch('buzzer-webhook-received', {
             teamId: teamId,
-            timestamp: timestamp
         });
 
         console.log(`Buzz accepted (Team ${teamId})`);
@@ -103,20 +102,20 @@ class BuzzerHandler {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
-            body: JSON.stringify({ pin: pin })
+            body: JSON.stringify({pin: pin})
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log(`Buzzer test successful: ${data.team_name}`);
-                window.playSound('buzzer');
-            } else {
-                console.error(`Buzzer test failed: ${data.message}`);
-            }
-        })
-        .catch(error => {
-            console.error('Buzzer test error:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`Buzzer test successful: ${data.team_name}`);
+                    window.playSound('buzzer');
+                } else {
+                    console.error(`Buzzer test failed: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Buzzer test error:', error);
+            });
     }
 }
 

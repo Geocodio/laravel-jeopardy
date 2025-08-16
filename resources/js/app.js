@@ -16,6 +16,7 @@ window.Echo = new Echo({
 });
 
 // Import game modules
+import './buzzer.js';
 import './buzzer-handler.js';
 import './game-timer.js';
 import './game-animations.js';

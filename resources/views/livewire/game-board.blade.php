@@ -26,7 +26,7 @@
             <div class="text-center mb-6">
                 <div class="flex flex-col items-center gap-4">
                     <!-- Laravel Logo -->
-                    <svg class="w-64 h-16" 
+                    <svg class="w-64 h-16"
                          x-show="mounted"
                          x-transition:enter="transition ease-out duration-[2000ms] delay-[1000ms]"
                          x-transition:enter-start="opacity-0 -translate-y-8 scale-95"
@@ -144,8 +144,22 @@
             <livewire:clue-display :clue-id="$selectedClue->id" />
         @endif
 
-        <!-- Buzzer Listener -->
-        <livewire:buzzer-listener :game-id="$game->id" />
+        <!-- Audio elements for buzzer sounds -->
+        <audio id="buzzer-blade" preload="auto">
+            <source src="/sounds/buzzer/blade.wav" type="audio/wav">
+        </audio>
+        <audio id="buzzer-artisan" preload="auto">
+            <source src="/sounds/buzzer/artisan.wav" type="audio/wav">
+        </audio>
+        <audio id="buzzer-eloquent" preload="auto">
+            <source src="/sounds/buzzer/eloquent.wav" type="audio/wav">
+        </audio>
+        <audio id="buzzer-facade" preload="auto">
+            <source src="/sounds/buzzer/facade.wav" type="audio/wav">
+        </audio>
+        <audio id="buzzer-illuminate" preload="auto">
+            <source src="/sounds/buzzer/illuminate.wav" type="audio/wav">
+        </audio>
     @else
         <div class="flex items-center justify-center h-screen">
             <div class="text-center backdrop-blur-lg bg-black/50 rounded-2xl p-12 border border-purple-500/30">

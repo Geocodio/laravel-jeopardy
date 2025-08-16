@@ -34,11 +34,11 @@ class BuzzerServer extends Command
     ];
 
     private $ledPinIds = [
-	    21, // White 
-	    14, // Red
-	    23, // Yellow
-	    15, // Green
-	    20, // Blue
+        21, // White
+        14, // Red
+        23, // Yellow
+        15, // Green
+        20, // Blue
     ];
 
     /**
@@ -90,6 +90,14 @@ class BuzzerServer extends Command
         foreach ($this->buttonPins as $index => $pin) {
             if ($pin->isOff()) {
                 $this->info("Button on pin #{$index} is pressed");
+
+                try {
+                    Http::get('http://sierra.local:8000/api/buzzer', [
+                        'pin_id' => $id
+                    ]);
+                } catch (Exception $e) {
+                    $this->error("Failed to send request for pin #{$id}: " . $e->getMessage());
+                }
 
                 for ($i = 0; $i < 5; $i++) {
                     $this->ledPins[$index]->turnOff();

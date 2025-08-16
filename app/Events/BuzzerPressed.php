@@ -2,10 +2,10 @@
 
 namespace App\Events;
 
+use App\Models\Team;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -14,36 +14,47 @@ class BuzzerPressed implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public int $teamId;
-    public string $timestamp;
-    public ?int $gameId;
+    public Team $team;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(int $teamId, string $timestamp, ?int $gameId = null)
+    public function __construct(Team $team)
     {
-        $this->teamId = $teamId;
-        $this->timestamp = $timestamp;
-        $this->gameId = $gameId;
+        $this->team = $team;
     }
 
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return array<int, Channel>
      */
     public function broadcastOn(): array
     {
         $channels = [];
 
-        if ($this->gameId) {
-            $channels[] = new PresenceChannel('game.' . $this->gameId);
+        if ($this->team->game_id) {
+            $channels[] = new PresenceChannel('game.' . $this->team->game_id);
         }
 
         $channels[] = new Channel('buzzers');
 
         return $channels;
+    }
+    
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'teamId' => $this->team->id,
+            'teamName' => $this->team->name,
+            'teamColor' => $this->team->color_hex,
+            'gameId' => $this->team->game_id,
+        ];
     }
 
     /**
