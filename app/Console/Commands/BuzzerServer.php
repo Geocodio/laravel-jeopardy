@@ -58,15 +58,17 @@ class BuzzerServer extends Command
     {
         $this->buttonPins = [];
         foreach ($this->buttonPinIds as $pin) {
-            $this->buttonPins[$pin] = PinService::pin($pin);
-            $this->buttonPins[$pin]->makeInput();
+            $buttonPin = PinService::pin($pin);
+            $buttonPin->makeInput();
+            $this->buttonPins[] = $buttonPin;
         }
 
         $this->ledPins = [];
         foreach ($this->ledPinIds as $pin) {
-            $this->ledPins[$pin] = PinService::pin($pin);
-            $this->ledPins[$pin]->makeOutput();
-            $this->ledPins[$pin]->turnOn();
+            $ledPin = PinService::pin($pin);
+            $ledPin->makeOutput();
+            $ledPin->turnOn();
+            $this->ledPins[] = $ledPin;
         }
     }
 
