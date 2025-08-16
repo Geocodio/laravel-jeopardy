@@ -76,7 +76,7 @@ class BuzzerServer extends Command
     {
         while (true) {
             foreach ($this->ledPins as $id => $pin) {
-                echo 'Turning on '.$id."\n";
+                echo 'Turning on ' . $id . "\n";
                 $pin->turnOff();
                 sleep(1);
                 $pin->turnOn();
@@ -87,10 +87,9 @@ class BuzzerServer extends Command
 
     private function checkButtons(): void
     {
-        foreach ($this->buttonPins as $id => $pin) {
+        foreach ($this->buttonPins as $index => $pin) {
             if ($pin->isOff()) {
-                $index = array_search($id, $this->buttonPinIds, true);
-                $this->info("Button on pin {$id} is pressed. Index= . $index");
+                $this->info("Button on pin #{$index} is pressed");
 
                 for ($i = 0; $i < 5; $i++) {
                     $this->ledPins[$index]->turnOff();
