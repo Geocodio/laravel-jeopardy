@@ -1,20 +1,19 @@
 <div class="h-screen overflow-y-auto bg-gradient-to-br from-slate-900 to-slate-800 text-white">
     @if($game)
-        <div class="container mx-auto px-4 py-4 relative">
-            <!-- Game ID in corner -->
-            <div class="absolute top-4 left-4 text-xs text-slate-500 bg-slate-800/50 backdrop-blur px-2 py-1 rounded">
-                Game ID: {{ $game->id }}
-            </div>
-            
-            <!-- Lightning Round Button -->
-            @if($game->status === 'main_game')
-                <div class="flex justify-end mb-4">
+        <div class="container mx-auto px-4 py-4">
+            <!-- Top Bar with Game ID and Lightning Round -->
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-sm text-yellow-400 bg-slate-900/80 px-3 py-1 rounded border border-slate-700">
+                    Game ID: {{ $game->id }}
+                </div>
+                
+                @if($game->status === 'main_game')
                     <button wire:click="startLightningRound" 
                         class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors">
                         ⚡ Start Lightning Round
                     </button>
-                </div>
-            @endif
+                @endif
+            </div>
 
             <!-- Main Content Grid - Optimized for iPad Pro -->
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
