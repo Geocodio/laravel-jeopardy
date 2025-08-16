@@ -26,19 +26,19 @@ class BuzzerServer extends Command
     private array $ledPins;
 
     private $buttonPinIds = [
-        17,
-        18,
-        24,
-        25,
-        5,
+        17, // White
+        18, // Red
+        24, // Yellow
+        25, // Green
+        5,  // Blue
     ];
 
     private $ledPinIds = [
-        14,
-        15,
-        23,
-        20,
-        21,
+	    21, // White 
+	    14, // Red
+	    23, // Yellow
+	    15, // Green
+	    20, // Blue
     ];
 
     /**
