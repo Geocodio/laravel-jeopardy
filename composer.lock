@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1e84796953f736a3870ef5c515310563",
+    "content-hash": "734e2972024ea43f735b29b487c68430",
     "packages": [
         {
             "name": "brick/math",
@@ -137,16 +137,16 @@
         },
         {
             "name": "danjohnson95/pinout",
-            "version": "v2.0.1",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/danjohnson95/pinout.git",
-                "reference": "fe6f78d7aa4b393a04bf2c0c11bc1b92593db217"
+                "url": "https://github.com/benammiswift/pinout.git",
+                "reference": "ebdce3bc588b4c4fd16ce7824e83d2aed8ed931d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danjohnson95/pinout/zipball/fe6f78d7aa4b393a04bf2c0c11bc1b92593db217",
-                "reference": "fe6f78d7aa4b393a04bf2c0c11bc1b92593db217",
+                "url": "https://api.github.com/repos/benammiswift/pinout/zipball/ebdce3bc588b4c4fd16ce7824e83d2aed8ed931d",
+                "reference": "ebdce3bc588b4c4fd16ce7824e83d2aed8ed931d",
                 "shasum": ""
             },
             "require": {
@@ -162,15 +162,16 @@
                 "pestphp/pest": "^1.20|^2.0",
                 "phpstan/phpstan-phpunit": "^1.1"
             },
+            "default-branch": true,
             "type": "project",
             "extra": {
                 "laravel": {
-                    "aliases": {
-                        "PinService": "DanJohnson95\\Pinout\\Facades\\PinService"
-                    },
                     "providers": [
                         "DanJohnson95\\Pinout\\ServiceProvider"
-                    ]
+                    ],
+                    "aliases": {
+                        "PinService": "DanJohnson95\\Pinout\\Facades\\PinService"
+                    }
                 }
             },
             "autoload": {
@@ -178,7 +179,46 @@
                     "DanJohnson95\\Pinout\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "DanJohnson95\\Pinout\\Tests\\": "tests/",
+                    "Workbench\\App\\": "workbench/app/",
+                    "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+                    "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "format": [
+                    "vendor/bin/php-cs-fixer fix --allow-risky=yes"
+                ],
+                "analyse": [
+                    "vendor/bin/phpstan analyse"
+                ],
+                "post-autoload-dump": [
+                    "@clear",
+                    "@prepare"
+                ],
+                "clear": [
+                    "@php vendor/bin/testbench package:purge-skeleton --ansi"
+                ],
+                "prepare": [
+                    "@php vendor/bin/testbench package:discover --ansi"
+                ],
+                "build": [
+                    "@php vendor/bin/testbench workbench:build --ansi"
+                ],
+                "serve": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "@build",
+                    "@php vendor/bin/testbench serve"
+                ],
+                "lint": [
+                    "@php vendor/bin/phpstan analyse"
+                ]
+            },
             "authors": [
                 {
                     "name": "Dan Johnson",
@@ -186,10 +226,9 @@
                 }
             ],
             "support": {
-                "issues": "https://github.com/danjohnson95/pinout/issues",
-                "source": "https://github.com/danjohnson95/pinout/tree/v2.0.1"
+                "source": "https://github.com/benammiswift/pinout/tree/main"
             },
-            "time": "2025-03-02T21:43:33+00:00"
+            "time": "2025-07-11T22:56:24+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -9708,7 +9747,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "danjohnson95/pinout": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
