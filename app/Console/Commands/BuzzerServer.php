@@ -26,27 +26,51 @@ class BuzzerServer extends Command
      */
     public function handle()
     {
-        $buttonPins = [
+        $buttonPinIds = [
             17,
             18,
+            24,
+            25,
+            5
         ];
 
-        $pins = [];
+        $ledPinIds = [
+            14,
+            15,
+            23,
+            20,
+            21
+        ];
 
-        foreach ($buttonPins as $pin) {
-            $pins[$pin] = PinService::pin($pin);
-            $pins[$pin]->makeInput();
+        $buttonPins = [];
+        foreach ($buttonPinIds as $pin) {
+            $buttonPins[$pin] = PinService::pin($pin);
+            $buttonPins[$pin]->makeInput();
+        }
+
+        $ledPins = [];
+        foreach ($ledPinIds as $pin) {
+            $ledPins[$pin] = PinService::pin($pin);
+            $ledPins[$pin]->makeOutput();
         }
 
         while (true) {
-            $this->checkButtons($pins);
+            foreach ($ledPins as $pin) {
+                $pin->turnOn();
+                sleep(1);
+                $pin->turnOff();
+                sleep(1);
+            }
+            /*
+            $this->checkButtons($buttonPins);
             usleep(10000); // Sleep for 10ms
+            */
         }
     }
 
-    private function checkButtons(array $pins): void
+    private function checkButtons(array $buttonPins): void
     {
-        foreach ($pins as $id => $pin) {
+        foreach ($buttonPins as $id => $pin) {
             if ($pin->isOff()) {
                 $this->info("Button on pin {$id} is pressed.");
             }
