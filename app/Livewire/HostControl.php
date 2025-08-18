@@ -30,9 +30,9 @@ class HostControl extends Component
     // Daily Double
     public bool $showDailyDoubleWager = false;
 
-    public ?Team $dailyDoubleTeam = null;
-
     public int $dailyDoubleWager = 0;
+
+    public array $wagerOptions = [];
 
     // Clue Display
     public bool $showClueModal = false;
@@ -69,6 +69,14 @@ class HostControl extends Component
         if ($this->game->current_clue_id) {
             $this->selectedClue = Clue::find($this->game->current_clue_id);
             $this->showClueModal = true;
+        }
+
+        // If game just started and no team is selected, select Team Illuminate
+        if ($this->game->status === 'main_game' && ! $this->currentTeam) {
+            $teamIlluminate = $this->teams->where('name', 'Team Illuminate')->first();
+            if ($teamIlluminate) {
+                $this->selectCurrentTeam($teamIlluminate->id);
+            }
         }
     }
 
@@ -107,8 +115,8 @@ class HostControl extends Component
         // Check if Daily Double
         if ($clue->is_daily_double) {
             $this->showDailyDoubleWager = true;
-            $this->dailyDoubleTeam = $this->currentTeam;
             $this->dailyDoubleWager = 0;
+            $this->calculateWagerOptions();
             // Broadcast daily double sound event
             broadcast(new DailyDoubleTriggered($this->game->id, $clueId));
         }
@@ -128,14 +136,87 @@ class HostControl extends Component
     // Daily Double Wager
     public function setDailyDoubleWager($amount)
     {
-        $this->dailyDoubleWager = max(5, min($amount, 2000));
+        $maxWager = $this->getMaximumWager();
+        $this->dailyDoubleWager = max(100, min($amount, $maxWager));
         $this->showDailyDoubleWager = false;
 
         // Broadcast wager to all clients
         broadcast(new GameStateChanged($this->game->id, 'daily-double-wager-set', [
-            'teamId' => $this->dailyDoubleTeam->id,
+            'teamId' => $this->currentTeam->id,
             'wager' => $this->dailyDoubleWager,
         ]));
+    }
+
+    private function getMaximumWager()
+    {
+        if (!$this->currentTeam) {
+            return 400; // Default max if no team selected
+        }
+
+        // Maximum is either current score (if positive) or highest clue value in round
+        $teamScore = $this->currentTeam->score;
+        
+        // Determine the highest clue value based on game phase
+        // In regular Jeopardy, max clue value is 400
+        // Could be extended for Double Jeopardy round (800) in future
+        $highestClueValue = 400;
+        
+        // If team has positive score, they can wager up to their score
+        // If zero or negative, they can wager up to the highest clue value
+        return $teamScore > 0 ? $teamScore : $highestClueValue;
+    }
+
+    private function calculateWagerOptions()
+    {
+        if (!$this->currentTeam) {
+            $this->wagerOptions = [];
+            return;
+        }
+
+        $maxWager = $this->getMaximumWager();
+        $options = [];
+        
+        // Always include minimum wager (we'll use 100 as minimum for simplicity)
+        $options[] = 100;
+        
+        // Add common increments
+        $increments = [200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000];
+        
+        foreach ($increments as $amount) {
+            if ($amount <= $maxWager && !in_array($amount, $options)) {
+                $options[] = $amount;
+            }
+        }
+        
+        // If team score is positive and not already in options, add it as "True Daily Double"
+        if ($this->currentTeam->score > 0 && !in_array($this->currentTeam->score, $options)) {
+            $options[] = $this->currentTeam->score;
+        }
+        
+        // Sort options
+        sort($options);
+        
+        // Limit to 8 options for UI consistency
+        if (count($options) > 8) {
+            // Keep first few, some middle values, and the max
+            $filtered = [];
+            $filtered[] = $options[0]; // minimum
+            
+            // Add evenly distributed values
+            $step = (count($options) - 2) / 6; // We want 6 middle values
+            for ($i = 1; $i <= 6; $i++) {
+                $index = min(round($i * $step), count($options) - 2);
+                if (!in_array($options[$index], $filtered)) {
+                    $filtered[] = $options[$index];
+                }
+            }
+            
+            $filtered[] = $options[count($options) - 1]; // maximum
+            
+            $this->wagerOptions = $filtered;
+        } else {
+            $this->wagerOptions = $options;
+        }
     }
 
     public function markCorrect($teamId = null)
@@ -228,6 +309,8 @@ class HostControl extends Component
             $this->game->current_team_id = null;
             $this->game->save();
 
+            // Broadcast that buzzers are now open
+            broadcast(new GameStateChanged($this->game->id, 'buzzers-opened'));
         }
 
         // Refresh team to get updated score
@@ -270,8 +353,8 @@ class HostControl extends Component
         $this->showClueModal = false;
         $this->selectedClue = null;
         $this->showDailyDoubleWager = false;
-        $this->dailyDoubleTeam = null;
         $this->dailyDoubleWager = 0;
+        $this->wagerOptions = [];
 
         $this->game->update(['current_clue_id' => null]);
         $this->game->refresh();
@@ -298,22 +381,6 @@ class HostControl extends Component
         )->to(TeamScoreboard::class);
 
         $this->teams = $this->game->teams()->get();
-    }
-
-    // Manual Buzzer Trigger
-    public function triggerBuzzer($teamId)
-    {
-        $team = Team::find($teamId);
-        if (! $team) {
-            return;
-        }
-
-        // Simulate buzzer press
-        $this->dispatch('buzzer-pressed', teamId: $teamId)->to(ClueDisplay::class);
-        $this->dispatch('buzzer-pressed', teamId: $teamId)->to(BuzzerListener::class);
-
-        // Set as current answering team
-        $this->currentTeam = $team;
     }
 
     // Lightning Round Control

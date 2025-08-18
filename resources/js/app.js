@@ -1,24 +1,12 @@
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
 import confetti from 'canvas-confetti';
-
-// Make confetti available globally for Alpine.js
-window.confetti = confetti;
-
-// Configure Laravel Echo
-window.Pusher = Pusher;
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    forceTLS: true
-});
-
 // Import game modules
+import './echo.js';
 import './buzzer.js';
 import './buzzer-handler.js';
 import './game-animations.js';
+
+// Make confetti available globally for Alpine.js
+window.confetti = confetti;
 
 // Subscribe to private game channel for real-time updates
 if (window.gameId) {
@@ -50,3 +38,9 @@ if (window.gameId) {
             Livewire.dispatch('daily-double-triggered', e);
         });
 }
+
+/**
+ * Echo exposes an expressive API for subscribing to channels and listening
+ * for events that are broadcast by Laravel. Echo and event broadcasting
+ * allow your team to quickly build robust real-time web applications.
+ */

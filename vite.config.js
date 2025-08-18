@@ -1,6 +1,4 @@
-import {
-    defineConfig
-} from 'vite';
+import {defineConfig} from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from "@tailwindcss/vite";
 
@@ -12,7 +10,6 @@ export default defineConfig({
                 'resources/css/jeopardy.css',
                 'resources/js/app.js',
                 'resources/js/buzzer-handler.js',
-                'resources/js/game-timer.js'
             ],
             refresh: true,
         }),

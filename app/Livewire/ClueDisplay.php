@@ -45,13 +45,27 @@ class ClueDisplay extends Component
         $this->clue = Clue::with(['category', 'category.game.teams'])->findOrFail($clueId);
         $this->isDailyDouble = $this->clue->is_daily_double;
         $this->availableTeams = $this->clue->category->game->teams;
+
+        // If there's a current team in control, set them as the buzzer team
+        $game = $this->clue->category->game;
+        if ($game->current_team_id) {
+            $this->buzzerTeam = Team::find($game->current_team_id);
+        }
     }
 
     #[On('buzzer-pressed')]
     public function handleBuzzer($teamId)
     {
+        // Check if there's already a team in control
         if ($this->buzzerTeam) {
             return;
+        }
+
+        // Check if buzzers should be enabled (no current team in control)
+        $game = $this->clue->category->game;
+        $game->refresh();
+        if ($game->current_team_id && ! $this->isDailyDouble) {
+            return; // Buzzers are disabled, a team is in control
         }
 
         $this->buzzerTeam = Team::find($teamId);

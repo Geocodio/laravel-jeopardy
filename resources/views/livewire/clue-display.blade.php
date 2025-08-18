@@ -42,44 +42,12 @@
 
                 <div
                     class="relative backdrop-blur-xl bg-black/50 rounded-3xl p-12 border-4 border-yellow-400 shadow-[0_0_100px_rgba(250,204,21,0.5)]">
-                    <h1 class="text-6xl md:text-8xl font-black text-center mb-8 animate-bounce">
+                    <h1 class="text-6xl md:text-8xl font-black text-center animate-bounce">
                         <span
                             class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500">
                             DAILY DOUBLE!
                         </span>
                     </h1>
-
-                    <div class="text-3xl text-center mb-8 text-blue-200">
-                        {{ $buzzerTeam ? $buzzerTeam->name : 'Select Team & Wager' }}
-                    </div>
-
-                    @if(!$buzzerTeam)
-                        <div class="mb-6">
-                            <h3 class="text-xl font-bold text-yellow-300 mb-4 text-center">Select Team:</h3>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-                                @foreach($availableTeams as $team)
-                                    <button
-                                        wire:click="selectTeamManually({{ $team->id }})"
-                                        class="px-4 py-3 rounded-lg font-bold text-white transition-all transform hover:scale-105 shadow-lg"
-                                        style="background-color: {{ $team->color_hex }}; border: 2px solid rgba(255,255,255,0.5)">
-                                        {{ $team->name }}
-                                    </button>
-                                @endforeach
-                            </div>
-                        </div>
-                    @else
-                        <div class="grid grid-cols-3 md:grid-cols-4 gap-4">
-                            @foreach([200, 400, 600, 800, 1000, 1200, 1500, 2000] as $amount)
-                                <button
-                                    wire:click="setWager({{ $amount }})"
-                                    class="group relative overflow-hidden bg-gradient-to-br from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 text-white font-bold py-4 px-6 rounded-xl text-2xl transition-all transform hover:scale-110 shadow-lg">
-                                    <span class="relative z-10">${{ number_format($amount) }}</span>
-                                    <div
-                                        class="absolute inset-0 bg-white/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                                </button>
-                            @endforeach
-                        </div>
-                    @endif
                 </div>
             </div>
         @else
@@ -93,6 +61,32 @@
 
                 <div
                     class="backdrop-blur-xl bg-gradient-to-br from-blue-900/90 via-indigo-900/90 to-purple-900/90 rounded-3xl p-8 md:p-12 border-2 border-white/20 shadow-2xl">
+
+                    <!-- Buzzer Status Indicator - Only shows when buzzers are open -->
+                    @if($clue && $clue->category && $clue->category->game && !$clue->category->game->current_team_id)
+                        <div class="absolute top-4 right-4">
+                            <div class="relative">
+                                <!-- Glow effect -->
+                                <div
+                                    class="absolute inset-0 bg-green-500 rounded-full blur-xl opacity-60 animate-pulse"></div>
+
+                                <!-- Bell icon container -->
+                                <div
+                                    class="relative bg-gradient-to-br from-green-400 to-emerald-500 rounded-full p-3 shadow-2xl">
+                                    <!-- Bell icon -->
+                                    <svg class="w-8 h-8 text-white animate-[ring_2s_ease-in-out_infinite]"
+                                         fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                                    </svg>
+
+                                    <!-- Animated ring waves -->
+                                    <div
+                                        class="absolute inset-0 rounded-full border-2 border-green-400 animate-ping"></div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Category and Value -->
                     <div class="text-center mb-6"
@@ -120,7 +114,7 @@
                     </div>
 
 
-                    <!-- Buzzer Team Display -->
+                    <!-- Team Display -->
                     @if($buzzerTeam)
                         <div class="text-center mt-8"
                              x-show="showContent"
@@ -133,7 +127,11 @@
                                 <div class="w-4 h-4 rounded-full animate-pulse"
                                      style="background-color: {{ $buzzerTeam->color_hex }}"></div>
                                 <span class="text-2xl font-bold" style="color: {{ $buzzerTeam->color_hex }}">
-                                    {{ $buzzerTeam->name }} buzzed in!
+                                    @if($clue && $clue->category && $clue->category->game && $clue->category->game->current_team_id == $buzzerTeam->id)
+                                        {{ $buzzerTeam->name }}'s turn to answer
+                                    @else
+                                        {{ $buzzerTeam->name }} buzzed in!
+                                    @endif
                                 </span>
                             </div>
                         </div>

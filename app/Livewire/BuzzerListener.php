@@ -4,13 +4,15 @@ namespace App\Livewire;
 
 use App\Models\Game;
 use App\Services\BuzzerService;
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
 class BuzzerListener extends Component
 {
     public bool $isListening = false;
+
     public array $lockedOut = [];
+
     public ?Game $game = null;
 
     protected $buzzerService;
@@ -31,6 +33,11 @@ class BuzzerListener extends Component
     #[On('lightning-question-shown')]
     public function enableBuzzers()
     {
+        // Refresh game state to get latest current_team_id
+        if ($this->game) {
+            $this->game->refresh();
+        }
+
         // Only enable buzzers if there's no controlling team (or for lightning round)
         if ($this->game && $this->game->current_team_id) {
             $this->isListening = false;
@@ -42,11 +49,13 @@ class BuzzerListener extends Component
     }
 
     #[On('open-buzzers')]
+    #[On('buzzers-opened')]
     public function openBuzzers()
     {
         // Called when host opens buzzers for all teams
         $this->isListening = true;
         $this->lockedOut = [];
+        $this->buzzerService->resetAllBuzzers();
     }
 
     #[On('clue-answered')]
@@ -66,7 +75,7 @@ class BuzzerListener extends Component
     #[On('buzzer-webhook-received')]
     public function processBuzz($teamId, $timestamp)
     {
-        if (!$this->isListening) {
+        if (! $this->isListening) {
             return;
         }
 
@@ -83,7 +92,7 @@ class BuzzerListener extends Component
 
             if ($buzzerEvent->is_first) {
                 $this->dispatch('play-sound', sound: 'buzzer');
-                
+
                 if ($this->game->status === 'main_game') {
                     $this->dispatch('buzzer-pressed', teamId: $teamId);
                 } else {
@@ -102,7 +111,7 @@ class BuzzerListener extends Component
     public function testBuzzer($pin)
     {
         $result = $this->buzzerService->testBuzzer($pin);
-        
+
         if ($result['success']) {
             $this->dispatch('buzzer-test-success', result: $result);
         } else {

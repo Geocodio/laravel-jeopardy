@@ -1,6 +1,6 @@
 <div class="flex flex-wrap justify-center gap-4 mb-8" wire:poll.3s="refreshScores">
     @foreach($teams as $index => $team)
-        <div class="relative group">
+        <div class="relative group" wire:key="team-{{ $team['id'] }}">
             @php
                 $isActive = $activeTeamId == $team['id'];
                 $hasRecentChange = isset($recentScoreChanges[$team['id']]);
@@ -9,18 +9,11 @@
                 $changeAmount = $changeData ? $changeData['points'] : 0;
             @endphp
 
-            <!-- Glow effect for active team -->
-            <div
-                class="absolute -inset-1 rounded-2xl blur-lg transition-all duration-500 {{ $isActive ? 'opacity-75' : 'opacity-0' }}"
-                style="background: linear-gradient(45deg, {{ $team['color_hex'] }}, transparent)">
-            </div>
-
-            <!-- Team Card -->
+                <!-- Team Card -->
             <div
                 class="relative backdrop-blur-lg rounded-2xl p-6 border-2 transition-all duration-500 transform
-                    {{ $isActive ? 'bg-black/50 scale-110 shadow-2xl' : 'bg-black/30 hover:bg-black/40 hover:scale-105' }}
-                    {{ $team['score'] < 0 ? 'border-red-500/50' : 'border-white/20' }}"
-                style="border-color: {{ $isActive ? $team['color_hex'] : '' }}">
+                    {{ $isActive ? 'bg-black/50 scale-110 shadow-2xl border-white' : 'bg-black/30 hover:bg-black/40 hover:scale-105 border-white/20' }}
+                    ">
 
                 <!-- Team Name -->
                 <h3
@@ -37,10 +30,10 @@
                             {{ $team['score'] < 0 ? 'text-red-400' : 'text-white' }}
                             {{ $hasRecentChange && $isCorrect ? 'animate-pulse' : '' }}">
                         <span class="text-sm">$</span>
-                        <span>{{ number_format(abs($team['score'])) }}</span>
                         @if($team['score'] < 0)
                             <span class="text-red-400">-</span>
                         @endif
+                        <span>{{ number_format(abs($team['score'])) }}</span>
                     </div>
 
                     <!-- Score Change Indicator -->
@@ -59,14 +52,15 @@
 </div>
 
 @push('scripts')
-<script>
-    // Listen for the clear animation event
-    document.addEventListener('livewire:init', function () {
-        Livewire.on('clear-score-animation-js', (event) => {
-            setTimeout(() => {
-                @this.clearScoreAnimation(event.teamId);
-            }, 3000);
+    <script>
+        // Listen for the clear animation event
+        document.addEventListener('livewire:init', function () {
+            Livewire.on('clear-score-animation-js', (event) => {
+                setTimeout(() => {
+                    @this.
+                    clearScoreAnimation(event.teamId);
+                }, 3000);
+            });
         });
-    });
-</script>
+    </script>
 @endpush

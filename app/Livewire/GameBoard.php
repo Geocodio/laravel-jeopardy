@@ -41,14 +41,33 @@ class GameBoard extends Component
 
         // Automatically transition from setup to main_game when board is loaded
         if ($this->game->status === 'setup') {
-            $this->game->update(['status' => 'main_game']);
+            // Set Team Illuminate as the first active team
+            $teamIlluminate = $this->game->teams->where('name', 'Team Illuminate')->first();
+            $this->game->update([
+                'status' => 'main_game',
+                'current_team_id' => $teamIlluminate ? $teamIlluminate->id : null,
+            ]);
             $this->game->refresh();
-            
+
             // Broadcast that the game has started
             broadcast(new \App\Events\GameStateChanged($this->game->id, 'game-started'));
+
+            // Broadcast team selection
+            if ($teamIlluminate) {
+                broadcast(new \App\Events\GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamIlluminate->id]));
+            }
         }
 
         $this->categories = $this->game->categories->sortBy('position');
+
+        // If there's a current clue (e.g., page was refreshed), restore it
+        if ($this->game->current_clue_id) {
+            $this->selectedClue = Clue::find($this->game->current_clue_id);
+            if ($this->selectedClue) {
+                $this->showClueModal = true;
+                $this->dispatch('clue-selected', clueId: $this->selectedClue->id);
+            }
+        }
     }
 
     public function selectClue($clueId)
@@ -82,7 +101,6 @@ class GameBoard extends Component
         $this->selectedClue = null;
         $this->game->update(['current_clue_id' => null]);
         $this->game->refresh();
-        $this->dispatch('reset-buzzers');
     }
 
     public function startLightningRound()

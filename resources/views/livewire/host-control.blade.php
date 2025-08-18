@@ -46,28 +46,20 @@
                                         </div>
                                     </div>
 
-                                    <!-- Control Buttons -->
-                                    <div class="flex gap-2">
+                                    <!-- Control Button -->
+                                    <div>
                                         <!-- Select as Current Team -->
                                         <button wire:click="selectCurrentTeam({{ $team->id }})"
-                                                class="px-3 py-3 rounded-lg font-bold transition-all hover:scale-105
+                                                class="cursor-pointer px-4 py-3 rounded-lg font-bold transition-all hover:scale-105
                                                 {{ $currentTeam && $currentTeam->id === $team->id
                                                     ? 'bg-yellow-500 text-slate-900'
                                                     : 'bg-slate-700 hover:bg-slate-600 text-white' }}"
-                                                title="Select as current team">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        </button>
-
-                                        <!-- Manual Buzzer -->
-                                        <button wire:click="triggerBuzzer({{ $team->id }})"
-                                                class="px-3 py-3 rounded-lg font-bold text-white transition-all hover:scale-105"
-                                                style="background-color: {{ $team->color_hex }};
-                                                   box-shadow: 0 4px 15px {{ $team->color_hex }}50;"
-                                                title="Trigger buzzer for {{ $team->name }}">
-                                            🔔
+                                                title="Set as active team">
+                                            @if($currentTeam && $currentTeam->id === $team->id)
+                                                Active
+                                            @else
+                                                Set Active
+                                            @endif
                                         </button>
                                     </div>
                                 </div>
@@ -126,21 +118,41 @@
                 @if($showClueModal && $selectedClue)
                     <!-- Daily Double Wager -->
                     @if($showDailyDoubleWager)
-                        <div
-                            class="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 backdrop-blur-lg rounded-xl p-8 border-2 border-yellow-400">
-                            <h2 class="text-3xl font-black text-yellow-400 mb-6 animate-pulse">DAILY DOUBLE!</h2>
-                            <p class="text-2xl mb-6">Team: {{ $dailyDoubleTeam->name }}</p>
-                            <p class="text-lg text-gray-300 mb-6">Select Wager Amount:</p>
-                            <div class="grid grid-cols-4 gap-4">
-                                @foreach([200, 400, 600, 800, 1000, 1200, 1500, 2000] as $amount)
-                                    <button wire:click="setDailyDoubleWager({{ $amount }})"
-                                            class="px-6 py-6 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold text-2xl transition-all hover:scale-105">
-                                        ${{ number_format($amount) }}
-                                    </button>
-                                @endforeach
+                        @if($currentTeam)
+                            <div
+                                class="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 backdrop-blur-lg rounded-xl p-8 border-2 border-yellow-400">
+                                <h2 class="text-3xl font-black text-yellow-400 mb-6">DAILY DOUBLE!</h2>
+                                <div class="mb-6">
+                                    <p class="text-lg text-gray-300">{{ $currentTeam->name }}'s Wager</p>
+                                    <p class="text-sm text-gray-400 mt-1">
+                                        Current Score: ${{ number_format($currentTeam->score) }}
+                                    </p>
+                                    <p class="text-sm text-gray-400">
+                                        Maximum Wager: ${{ number_format($currentTeam->score > 0 ? $currentTeam->score : 400) }}
+                                    </p>
+                                </div>
+                                <div class="grid grid-cols-4 gap-4">
+                                    @foreach($wagerOptions as $amount)
+                                        <button wire:click="setDailyDoubleWager({{ $amount }})"
+                                                class="px-6 py-6 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold text-2xl transition-all hover:scale-105
+                                                {{ $amount == $currentTeam->score && $currentTeam->score > 0 ? 'ring-2 ring-yellow-400' : '' }}">
+                                            ${{ number_format($amount) }}
+                                            @if($amount == $currentTeam->score && $currentTeam->score > 0)
+                                                <span class="block text-xs mt-1">True DD!</span>
+                                            @endif
+                                        </button>
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
-                    @else
+                        @else
+                            <div
+                                class="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 backdrop-blur-lg rounded-xl p-8 border-2 border-yellow-400">
+                                <h2 class="text-3xl font-black text-yellow-400 mb-6 animate-pulse">DAILY DOUBLE!</h2>
+                                <p class="text-2xl mb-6 text-red-400">Please select a team first before revealing Daily
+                                    Double!</p>
+                            </div>
+                        @endif
+                    @elseif($selectedClue)
                         <!-- Clue Info -->
                         <div class="bg-slate-800/50 backdrop-blur-lg rounded-xl p-8 border border-slate-700">
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">

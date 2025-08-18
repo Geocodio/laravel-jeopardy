@@ -90,33 +90,21 @@
                             @if($clue)
                                 <div class="group perspective-1000">
 
-                                    @if(!$clue->is_answered)
-                                        <!-- Animated Border for Active Clues -->
-                                        <div class="absolute -inset-0.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 rounded-xl blur animate-pulse"></div>
-                                        </div>
-                                    @endif
 
                                     <!-- Clue Card -->
-                                    <div @if(!$clue->is_answered)
-                                            wire:click="selectClue({{ $clue->id }})"
-                                         @endif
-                                         class="relative h-24 md:h-28 lg:h-32 rounded-xl flex items-center justify-center cursor-pointer transform transition-all duration-300 preserve-3d
+                                    <div class="relative h-24 md:h-28 lg:h-32 rounded-xl flex items-center justify-center transform transition-all duration-300 preserve-3d
                                                 {{ $clue->is_answered
                                                    ? 'bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm'
-                                                   : 'bg-gradient-to-br from-blue-600/90 to-purple-700/90 backdrop-blur-xl group-hover:scale-110 group-hover:rotate-y-5 group-hover:rotate-x-5 group-hover:shadow-2xl' }}"
+                                                   : 'bg-gradient-to-br from-blue-600/90 to-purple-700/90 backdrop-blur-xl' }}"
                                          :class="{ 'ring-4 ring-yellow-400/50': selectedCategory === {{ $category->id }} && !{{ $clue->is_answered ? 'true' : 'false' }} }">
 
                                         @if(!$clue->is_answered)
                                             <!-- Value Display -->
                                             <div class="relative">
-                                                <div class="text-4xl md:text-5xl lg:text-6xl font-black text-yellow-400 drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] transform group-hover:scale-110 transition-transform duration-300">
+                                                <div class="text-4xl md:text-5xl lg:text-6xl font-black text-yellow-400 drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]">
                                                     ${{ $value }}
                                                 </div>
                                             </div>
-
-                                            <!-- Hover Effect Overlay -->
-                                            <div class="absolute inset-0 bg-gradient-to-t from-white/0 to-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                         @else
                                             <!-- Answered Indicator -->
                                             <div class="text-gray-600">
