@@ -5,20 +5,25 @@ namespace App\Livewire;
 use App\Models\Game;
 use App\Models\LightningQuestion;
 use App\Models\Team;
-use App\Services\ScoringService;
 use App\Services\BuzzerService;
-use Livewire\Component;
+use App\Services\ScoringService;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
 class LightningRound extends Component
 {
     public ?Game $game = null;
+
     public ?LightningQuestion $currentQuestion = null;
+
     public int $questionsRemaining = 0;
+
     public array $buzzerOrder = [];
+
     public ?Team $currentAnsweringTeam = null;
 
     protected $scoringService;
+
     protected $buzzerService;
 
     public function boot(ScoringService $scoringService, BuzzerService $buzzerService)
@@ -39,7 +44,7 @@ class LightningRound extends Component
             ->where('is_current', true)
             ->first();
 
-        if (!$this->currentQuestion) {
+        if (! $this->currentQuestion) {
             $this->currentQuestion = $this->game->lightningQuestions
                 ->where('is_answered', false)
                 ->sortBy('order_position')
@@ -65,7 +70,7 @@ class LightningRound extends Component
             return;
         }
 
-        if (!in_array($teamId, $this->buzzerOrder)) {
+        if (! in_array($teamId, $this->buzzerOrder)) {
             $this->buzzerOrder[] = $teamId;
         }
 
@@ -77,7 +82,7 @@ class LightningRound extends Component
 
     public function markLightningCorrect()
     {
-        if (!$this->currentAnsweringTeam || !$this->currentQuestion) {
+        if (! $this->currentAnsweringTeam || ! $this->currentQuestion) {
             return;
         }
 
@@ -93,14 +98,14 @@ class LightningRound extends Component
 
     public function markLightningIncorrect()
     {
-        if (!$this->currentAnsweringTeam || !$this->currentQuestion) {
+        if (! $this->currentAnsweringTeam || ! $this->currentQuestion) {
             return;
         }
 
         // Remove team from current question and try next in buzzer order
         array_shift($this->buzzerOrder);
-        
-        if (!empty($this->buzzerOrder)) {
+
+        if (! empty($this->buzzerOrder)) {
             $nextTeamId = $this->buzzerOrder[0];
             $this->currentAnsweringTeam = Team::find($nextTeamId);
             $this->dispatch('buzzer-accepted', teamId: $nextTeamId);
@@ -135,6 +140,7 @@ class LightningRound extends Component
             // Lightning round complete
             $this->dispatch('lightning-round-complete');
             $this->game->update(['status' => 'finished']);
+            $this->game->refresh();
         }
     }
 

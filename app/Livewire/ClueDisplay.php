@@ -47,7 +47,6 @@ class ClueDisplay extends Component
         $this->availableTeams = $this->clue->category->game->teams;
     }
 
-
     #[On('buzzer-pressed')]
     public function handleBuzzer($teamId)
     {
@@ -61,11 +60,11 @@ class ClueDisplay extends Component
 
     public function markCorrect()
     {
-        if (!$this->buzzerTeam || !$this->clue) {
+        if (! $this->buzzerTeam || ! $this->clue) {
             return;
         }
 
-        $pointsAwarded = $this->isDailyDouble ? (int)$this->wagerAmount : (int)$this->clue->value;
+        $pointsAwarded = $this->isDailyDouble ? (int) $this->wagerAmount : (int) $this->clue->value;
 
         if ($this->isDailyDouble) {
             $this->scoringService->handleDailyDouble(
@@ -85,6 +84,7 @@ class ClueDisplay extends Component
 
         // Update current team - they keep control
         $this->clue->category->game->update(['current_team_id' => $this->buzzerTeam->id]);
+        $this->clue->category->game->refresh();
 
         $this->dispatch('play-sound', sound: 'correct');
         $this->dispatch('score-updated',
@@ -99,11 +99,11 @@ class ClueDisplay extends Component
 
     public function markIncorrect()
     {
-        if (!$this->buzzerTeam || !$this->clue) {
+        if (! $this->buzzerTeam || ! $this->clue) {
             return;
         }
 
-        $pointsDeducted = $this->isDailyDouble ? (int)$this->wagerAmount : (int)$this->clue->value;
+        $pointsDeducted = $this->isDailyDouble ? (int) $this->wagerAmount : (int) $this->clue->value;
 
         if ($this->isDailyDouble) {
             $this->scoringService->handleDailyDouble(
@@ -138,6 +138,7 @@ class ClueDisplay extends Component
             if ($game->current_team_id == $this->buzzerTeam->id) {
                 // Controlling team got it wrong, open buzzers for everyone
                 $game->update(['current_team_id' => null]);
+                $game->refresh();
                 $this->dispatch('team-lost-control', teamId: $this->buzzerTeam->id);
             }
 
@@ -165,7 +166,7 @@ class ClueDisplay extends Component
 
     public function toggleManualTeamSelection()
     {
-        $this->showManualTeamSelection = !$this->showManualTeamSelection;
+        $this->showManualTeamSelection = ! $this->showManualTeamSelection;
     }
 
     public function selectTeamManually($teamId)
@@ -210,7 +211,7 @@ class ClueDisplay extends Component
             $this->reset(['clue', 'buzzerTeam', 'showManualTeamSelection', 'wagerAmount']);
         } elseif ($state === 'team-selected' && isset($data['teamId'])) {
             // Update current team when host selects
-            if (!$this->buzzerTeam && $this->clue && !$this->clue->is_daily_double) {
+            if (! $this->buzzerTeam && $this->clue && ! $this->clue->is_daily_double) {
                 $this->buzzerTeam = Team::find($data['teamId']);
             }
         } elseif ($state === 'daily-double-wager-set') {
@@ -232,7 +233,7 @@ class ClueDisplay extends Component
     public function handleTeamSelected($teamId)
     {
         // Update current team when host selects
-        if (!$this->buzzerTeam && $this->clue && !$this->clue->is_daily_double) {
+        if (! $this->buzzerTeam && $this->clue && ! $this->clue->is_daily_double) {
             $this->buzzerTeam = Team::find($teamId);
         }
     }

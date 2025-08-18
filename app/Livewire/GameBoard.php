@@ -2,18 +2,20 @@
 
 namespace App\Livewire;
 
-use App\Models\Game;
-use App\Models\Category;
 use App\Models\Clue;
+use App\Models\Game;
 use App\Services\GameService;
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
 class GameBoard extends Component
 {
     public ?Game $game = null;
+
     public $categories;
+
     public ?Clue $selectedClue = null;
+
     public bool $showClueModal = false;
 
     protected $gameService;
@@ -37,22 +39,32 @@ class GameBoard extends Component
             'teams',
         ])->findOrFail($gameId);
 
+        // Automatically transition from setup to main_game when board is loaded
+        if ($this->game->status === 'setup') {
+            $this->game->update(['status' => 'main_game']);
+            $this->game->refresh();
+            
+            // Broadcast that the game has started
+            broadcast(new \App\Events\GameStateChanged($this->game->id, 'game-started'));
+        }
+
         $this->categories = $this->game->categories->sortBy('position');
     }
 
     public function selectClue($clueId)
     {
         $clue = Clue::findOrFail($clueId);
-        
+
         if ($clue->is_answered) {
             return;
         }
 
         $this->selectedClue = $clue;
         $this->showClueModal = true;
-        
+
         $clue->update(['is_revealed' => true]);
         $this->game->update(['current_clue_id' => $clueId]);
+        $this->game->refresh();
 
         $this->dispatch('clue-selected', clueId: $clueId);
     }
@@ -69,6 +81,7 @@ class GameBoard extends Component
         $this->showClueModal = false;
         $this->selectedClue = null;
         $this->game->update(['current_clue_id' => null]);
+        $this->game->refresh();
         $this->dispatch('reset-buzzers');
     }
 
@@ -81,7 +94,7 @@ class GameBoard extends Component
         $this->gameService->transitionToLightningRound($this->game->id);
         $this->game->refresh();
         $this->dispatch('lightning-round-started');
-        
+
         // Redirect to lightning round page
         return redirect()->route('game.lightning', ['gameId' => $this->game->id]);
     }
@@ -89,6 +102,7 @@ class GameBoard extends Component
     public function endGame()
     {
         $this->game->update(['status' => 'finished']);
+        $this->game->refresh();
         $finalScores = $this->gameService->calculateFinalScores($this->game->id);
         $this->dispatch('game-ended', scores: $finalScores);
     }
