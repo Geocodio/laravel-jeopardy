@@ -52,11 +52,11 @@
                                         <button wire:click="selectCurrentTeam({{ $team->id }})"
                                                 class="cursor-pointer px-4 py-3 rounded-lg font-bold transition-all hover:scale-105
                                                 {{ $currentTeam && $currentTeam->id === $team->id
-                                                    ? 'bg-yellow-500 text-slate-900'
+                                                    ? 'bg-yellow-500 text-slate-900 hover:bg-yellow-600'
                                                     : 'bg-slate-700 hover:bg-slate-600 text-white' }}"
-                                                title="Set as active team">
+                                                title="{{ $currentTeam && $currentTeam->id === $team->id ? 'Click to deselect' : 'Set as active team' }}">
                                             @if($currentTeam && $currentTeam->id === $team->id)
-                                                Active
+                                                Active ✓
                                             @else
                                                 Set Active
                                             @endif

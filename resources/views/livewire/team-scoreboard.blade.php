@@ -29,10 +29,13 @@
                         class="text-3xl font-black transition-all duration-300
                             {{ $team['score'] < 0 ? 'text-red-400' : 'text-white' }}
                             {{ $hasRecentChange && $isCorrect ? 'animate-pulse' : '' }}">
-                        <span class="text-sm">$</span>
-                        @if($team['score'] < 0)
-                            <span class="text-red-400">-</span>
-                        @endif
+                        <span class="text-sm">
+                            @if($team['score'] < 0)
+                                <span class="text-red-400">-</span>
+                            @endif
+
+                            $
+                        </span>
                         <span>{{ number_format(abs($team['score'])) }}</span>
                     </div>
 

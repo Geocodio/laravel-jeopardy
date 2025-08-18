@@ -83,21 +83,37 @@ class HostControl extends Component
     // Team Selection
     public function selectCurrentTeam($teamId)
     {
-        $this->currentTeam = Team::find($teamId);
+        // If clicking on already selected team, deselect it
+        if ($this->currentTeam && $this->currentTeam->id == $teamId) {
+            $this->currentTeam = null;
+            $this->game->current_team_id = null;
+            $this->game->save();
 
-        // Update the database and ensure it's saved
-        $this->game->current_team_id = $teamId;
-        $this->game->save();
+            Log::info('Team deselected', [
+                'game_id' => $this->game->id,
+                'previous_team_id' => $teamId,
+            ]);
 
-        // Verify the save worked
-        Log::info('Team selected', [
-            'game_id' => $this->game->id,
-            'team_id' => $teamId,
-            'saved_team_id' => $this->game->fresh()->current_team_id,
-        ]);
+            // Broadcast team deselection to all clients
+            broadcast(new GameStateChanged($this->game->id, 'team-deselected'));
+        } else {
+            // Select the new team
+            $this->currentTeam = Team::find($teamId);
 
-        // Broadcast team selection to all clients
-        broadcast(new GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
+            // Update the database and ensure it's saved
+            $this->game->current_team_id = $teamId;
+            $this->game->save();
+
+            // Verify the save worked
+            Log::info('Team selected', [
+                'game_id' => $this->game->id,
+                'team_id' => $teamId,
+                'saved_team_id' => $this->game->fresh()->current_team_id,
+            ]);
+
+            // Broadcast team selection to all clients
+            broadcast(new GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
+        }
     }
 
     // Clue Control
