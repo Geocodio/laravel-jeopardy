@@ -18,7 +18,6 @@ window.Echo = new Echo({
 // Import game modules
 import './buzzer.js';
 import './buzzer-handler.js';
-import './game-timer.js';
 import './game-animations.js';
 
 // Subscribe to private game channel for real-time updates

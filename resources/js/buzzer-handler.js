@@ -29,10 +29,6 @@ class BuzzerHandler {
             this.resetBuzzers();
         });
 
-        // Handle timer expiration
-        Livewire.on('timer-expired', () => {
-            this.disableBuzzers();
-        });
 
         // Handle buzzer lockout
         Livewire.on('lockout-team', ({teamId, duration}) => {

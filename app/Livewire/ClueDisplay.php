@@ -13,19 +13,11 @@ class ClueDisplay extends Component
 {
     public ?Clue $clue = null;
 
-    public int $timeRemaining = 30;
-    
-    public int $savedTimeRemaining = 30;
-
     public ?Team $buzzerTeam = null;
 
     public bool $isDailyDouble = false;
 
     public int $wagerAmount = 0;
-
-    public bool $timerRunning = false;
-
-    public bool $showingAnswer = false;
 
     public bool $showManualTeamSelection = false;
 
@@ -52,62 +44,28 @@ class ClueDisplay extends Component
     {
         $this->clue = Clue::with(['category', 'category.game.teams'])->findOrFail($clueId);
         $this->isDailyDouble = $this->clue->is_daily_double;
-        $this->timeRemaining = 30;
-        $this->savedTimeRemaining = 30;
         $this->availableTeams = $this->clue->category->game->teams;
-
-        // Don't start timer for Daily Double - wait for wager
-        if (! $this->isDailyDouble) {
-            $this->startTimer();
-        }
     }
 
-    public function startTimer()
-    {
-        $this->timerRunning = true;
-        $this->dispatch('start-timer');
-    }
-
-    #[On('timer-tick')]
-    public function handleTimerTick()
-    {
-        if ($this->timerRunning && $this->timeRemaining > 0) {
-            $this->timeRemaining--;
-
-            if ($this->timeRemaining === 0) {
-                $this->handleTimerExpired();
-            }
-        }
-    }
-
-    public function handleTimerExpired()
-    {
-        $this->timerRunning = false;
-        $this->dispatch('timer-expired');
-        $this->dispatch('play-sound', sound: 'times-up');
-    }
 
     #[On('buzzer-pressed')]
     public function handleBuzzer($teamId)
     {
-        if ($this->buzzerTeam || ! $this->timerRunning) {
+        if ($this->buzzerTeam) {
             return;
         }
 
         $this->buzzerTeam = Team::find($teamId);
-        // Save the remaining time and stop the timer
-        $this->savedTimeRemaining = $this->timeRemaining;
-        $this->timerRunning = false;
         $this->dispatch('buzzer-accepted', teamId: $teamId);
     }
 
     public function markCorrect()
     {
-        if (! $this->buzzerTeam || ! $this->clue) {
+        if (!$this->buzzerTeam || !$this->clue) {
             return;
         }
 
-        $pointsAwarded = $this->isDailyDouble ? (int) $this->wagerAmount : (int) $this->clue->value;
+        $pointsAwarded = $this->isDailyDouble ? (int)$this->wagerAmount : (int)$this->clue->value;
 
         if ($this->isDailyDouble) {
             $this->scoringService->handleDailyDouble(
@@ -136,16 +94,16 @@ class ClueDisplay extends Component
         );
         $this->dispatch('team-keeps-control', teamId: $this->buzzerTeam->id);
         $this->dispatch('clue-answered', clueId: $this->clue->id);
-        $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount', 'savedTimeRemaining']);
+        $this->reset(['buzzerTeam', 'showManualTeamSelection', 'wagerAmount']);
     }
 
     public function markIncorrect()
     {
-        if (! $this->buzzerTeam || ! $this->clue) {
+        if (!$this->buzzerTeam || !$this->clue) {
             return;
         }
 
-        $pointsDeducted = $this->isDailyDouble ? (int) $this->wagerAmount : (int) $this->clue->value;
+        $pointsDeducted = $this->isDailyDouble ? (int)$this->wagerAmount : (int)$this->clue->value;
 
         if ($this->isDailyDouble) {
             $this->scoringService->handleDailyDouble(
@@ -161,7 +119,7 @@ class ClueDisplay extends Component
                 correct: false
             );
             $this->dispatch('clue-answered', clueId: $this->clue->id);
-            $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount', 'savedTimeRemaining']);
+            $this->reset(['buzzerTeam', 'showManualTeamSelection', 'wagerAmount']);
         } else {
             // Deduct points but allow other teams to buzz
             $this->scoringService->deductPoints(
@@ -186,13 +144,6 @@ class ClueDisplay extends Component
             $this->buzzerService->lockoutTeam($this->buzzerTeam->id);
             $this->buzzerTeam = null;
             $this->showManualTeamSelection = false;
-            
-            // Resume timer from where it left off
-            $this->timeRemaining = $this->savedTimeRemaining;
-            if ($this->timeRemaining > 0) {
-                $this->timerRunning = true;
-                $this->dispatch('start-timer');
-            }
         }
 
         $this->dispatch('play-sound', sound: 'incorrect');
@@ -203,26 +154,18 @@ class ClueDisplay extends Component
         if ($this->clue) {
             $this->clue->update(['is_answered' => true]);
             $this->dispatch('clue-answered', clueId: $this->clue->id);
-            $this->reset(['buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount', 'savedTimeRemaining']);
+            $this->reset(['buzzerTeam', 'showManualTeamSelection', 'wagerAmount']);
         }
     }
 
     public function setWager($amount)
     {
         $this->wagerAmount = max(5, min($amount, 2000));
-        // Start timer after wager is set
-        $this->timeRemaining = 30;
-        $this->startTimer();
-    }
-
-    public function showAnswer()
-    {
-        $this->showingAnswer = true;
     }
 
     public function toggleManualTeamSelection()
     {
-        $this->showManualTeamSelection = ! $this->showManualTeamSelection;
+        $this->showManualTeamSelection = !$this->showManualTeamSelection;
     }
 
     public function selectTeamManually($teamId)
@@ -232,7 +175,6 @@ class ClueDisplay extends Component
         }
 
         $this->buzzerTeam = Team::find($teamId);
-        $this->timerRunning = false;
         $this->showManualTeamSelection = false;
 
         // Ensure clue is fresh
@@ -256,7 +198,6 @@ class ClueDisplay extends Component
         if ($state === 'answer-judged' && isset($data['clueId'])) {
             // Update local state when host judges answer as correct
             if ($this->clue && $this->clue->id == $data['clueId']) {
-                $this->timerRunning = false;
                 $this->dispatch('clue-answered', clueId: $data['clueId']);
                 // Don't reset immediately - let GameBoard handle the modal closing
             }
@@ -264,39 +205,18 @@ class ClueDisplay extends Component
             // Handle incorrect answer from host
             if ($this->clue && $this->clue->id == $data['clueId']) {
                 $this->buzzerTeam = null;
-                // Resume timer from saved time
-                $this->timeRemaining = $this->savedTimeRemaining;
-                if ($this->timeRemaining > 0) {
-                    $this->timerRunning = true;
-                    $this->dispatch('start-timer');
-                }
-            }
-        } elseif ($state === 'resume-timer') {
-            // Resume timer after incorrect answer
-            if ($this->clue && !$this->buzzerTeam) {
-                $this->timeRemaining = $this->savedTimeRemaining;
-                if ($this->timeRemaining > 0) {
-                    $this->timerRunning = true;
-                    $this->dispatch('start-timer');
-                }
             }
         } elseif ($state === 'clue-closed') {
-            $this->timerRunning = false;
-            $this->reset(['clue', 'buzzerTeam', 'timerRunning', 'showingAnswer', 'showManualTeamSelection', 'wagerAmount', 'savedTimeRemaining']);
+            $this->reset(['clue', 'buzzerTeam', 'showManualTeamSelection', 'wagerAmount']);
         } elseif ($state === 'team-selected' && isset($data['teamId'])) {
             // Update current team when host selects
             if (!$this->buzzerTeam && $this->clue && !$this->clue->is_daily_double) {
                 $this->buzzerTeam = Team::find($data['teamId']);
-                // Save time and stop timer when team is selected
-                $this->savedTimeRemaining = $this->timeRemaining;
-                $this->timerRunning = false;
             }
         } elseif ($state === 'daily-double-wager-set') {
             if (isset($data['teamId']) && isset($data['wager'])) {
                 $this->buzzerTeam = Team::find($data['teamId']);
                 $this->wagerAmount = $data['wager'];
-                $this->timeRemaining = 30;
-                $this->startTimer();
             }
         }
     }
@@ -314,7 +234,6 @@ class ClueDisplay extends Component
         // Update current team when host selects
         if (!$this->buzzerTeam && $this->clue && !$this->clue->is_daily_double) {
             $this->buzzerTeam = Team::find($teamId);
-            $this->timerRunning = false;
         }
     }
 

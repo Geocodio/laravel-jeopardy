@@ -50,7 +50,6 @@ class BuzzerListener extends Component
     }
 
     #[On('clue-answered')]
-    #[On('timer-expired')]
     public function disableBuzzers()
     {
         $this->isListening = false;

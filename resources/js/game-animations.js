@@ -18,19 +18,6 @@ if (!window.playSound) {
     };
 }
 
-// Timer Warning Effects
-window.setupTimerWarnings = function(element, timeRemaining) {
-    if (timeRemaining <= 5) {
-        element.classList.add('animate-pulse', 'text-red-500');
-        if (timeRemaining === 0) {
-            window.playSound('times-up');
-        }
-    } else if (timeRemaining <= 10) {
-        element.classList.add('text-yellow-500');
-    } else {
-        element.classList.add('text-green-500');
-    }
-};
 
 // Correct Answer Effects
 window.celebrateCorrectAnswer = function(teamElement) {
