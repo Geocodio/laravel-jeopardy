@@ -81,7 +81,7 @@
 
                     <!-- All Clues in 6 Columns -->
                     <div class="grid grid-cols-6 gap-3">
-                        @foreach([100, 200, 300, 400] as $value)
+                        @foreach([100, 300, 500, 1000] as $value)
                             @foreach($categories as $category)
                                 @php
                                     $clue = $category->clues->where('value', $value)->first();

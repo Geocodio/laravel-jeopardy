@@ -30,7 +30,7 @@ return [
     ],
 
     'game_settings' => [
-        'daily_double_min_value' => 200,
+        'daily_double_min_value' => 300,
         'lightning_round_time_limit' => 30,
         'points_multiplier' => 1,
     ],

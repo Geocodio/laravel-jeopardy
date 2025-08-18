@@ -2,11 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Game;
-use App\Models\Team;
-use App\Models\Category;
 use App\Models\Clue;
-use App\Models\LightningQuestion;
+use App\Models\Game;
 use Illuminate\Database\Seeder;
 
 class GameSeeder extends Seeder
@@ -28,112 +25,112 @@ class GameSeeder extends Seeder
 
         // Categories and clues
         $categoriesData = [
-            'Laravel Basics' => [
+            'Taylor\'s Version' => [
                 100 => [
-                    'question' => 'This artisan command creates a new Laravel project',
-                    'answer' => 'What is laravel new or composer create-project?'
-                ],
-                200 => [
-                    'question' => 'This file in the root directory contains all of your application routes',
-                    'answer' => 'What is routes/web.php?'
+                    'question' => 'Swift\'s emotional 2012 album title describes what developers see when tests fail',
+                    'answer' => 'What is "Red"?',
                 ],
                 300 => [
-                    'question' => 'This configuration file stores your database connection details',
-                    'answer' => 'What is .env or config/database.php?'
+                    'question' => 'Taylor\'s 2014 hit about relationships gone wrong also describes what PHP throws when you try to echo an uninitialized variable',
+                    'answer' => 'What is "Blank Space"?',
                 ],
-                400 => [
-                    'question' => 'This directory contains all of your Blade template files',
-                    'answer' => 'What is resources/views?'
+                500 => [
+                    'question' => 'Before creating Laravel, Taylor Otwell programmed in this 1960s business language',
+                    'answer' => 'What is COBOL?',
+                ],
+                1000 => [
+                    'question' => 'Taylor Otwell played this sport after school every day growing up',
+                    'answer' => 'What is basketball?',
                 ],
             ],
-            'Eloquent ORM' => [
+            '404: Category Not Found' => [
                 100 => [
-                    'question' => 'This method retrieves all records from a database table',
-                    'answer' => 'What is all() or get()?'
-                ],
-                200 => [
-                    'question' => 'This relationship type represents a one-to-many connection between models',
-                    'answer' => 'What is hasMany()?'
+                    'question' => 'This HTTP status code is returned when the client should authenticate itself',
+                    'answer' => 'What is 401 (Unauthorized)?',
                 ],
                 300 => [
-                    'question' => 'This Eloquent feature automatically manages created_at and updated_at columns',
-                    'answer' => 'What are timestamps?'
+                    'question' => 'This Laravel package provides a beautiful debugging interface to inspect errors',
+                    'answer' => 'What is Debugbar for Laravel?',
                 ],
-                400 => [
-                    'question' => 'This method creates query constraints that are always applied to a model',
-                    'answer' => 'What are global scopes?'
+                500 => [
+                    'question' => 'This error occurs when PHP runs out of allocated memory',
+                    'answer' => 'What is "Fatal error: Allowed memory size exhausted"?',
+                ],
+                1000 => [
+                    'question' => 'This HTTP status code means "I\'m a teapot" and was an April Fool\'s joke',
+                    'answer' => 'What is 418?',
                 ],
             ],
-            'Blade Templates' => [
+            'Laracon Legends' => [
                 100 => [
-                    'question' => 'This directive is used to display escaped data in Blade templates',
-                    'answer' => 'What is {{ }} or double curly braces?'
-                ],
-                200 => [
-                    'question' => 'This Blade directive includes another Blade view within the current view',
-                    'answer' => 'What is @include?'
+                    'question' => 'This European city has hosted Laracon EU the most times since 2013',
+                    'answer' => 'What is Amsterdam?',
                 ],
                 300 => [
-                    'question' => 'This directive defines a section that can be overridden by child views',
-                    'answer' => 'What is @yield or @section?'
+                    'question' => 'These two Australian cities have hosted Laracon AU',
+                    'answer' => 'What are Sydney and Brisbane?',
                 ],
-                400 => [
-                    'question' => 'This feature compiles Blade components into PHP classes for better performance',
-                    'answer' => 'What are class-based components or anonymous components?'
+                500 => [
+                    'question' => 'This U.S. capital city hosted the very first Laracon in 2013',
+                    'answer' => 'What is Washington, DC?',
+                ],
+                1000 => [
+                    'question' => 'This entrepreneur had the vision for the first Laracon',
+                    'answer' => 'Who is Ian Landsman?',
                 ],
             ],
-            'Artisan Commands' => [
+            'Rød Grød Med Fløde' => [
                 100 => [
-                    'question' => 'This command displays all available routes in your application',
-                    'answer' => 'What is route:list?'
-                ],
-                200 => [
-                    'question' => 'This artisan command creates a new database migration file',
-                    'answer' => 'What is make:migration?'
+                    'question' => 'This Danish shipping giant is the world\'s second-largest container company',
+                    'answer' => 'What is Maersk?',
                 ],
                 300 => [
-                    'question' => 'This command clears all cached configuration files',
-                    'answer' => 'What is config:clear or cache:clear?'
+                    'question' => 'These seafarers from whom Europe\'s oldest monarchy traces back',
+                    'answer' => 'Who are the Vikings?',
                 ],
-                400 => [
-                    'question' => 'This command runs your application\'s database seeders',
-                    'answer' => 'What is db:seed?'
+                500 => [
+                    'question' => 'This Danish programmer created PHP in 1994 and was born in Greenland',
+                    'answer' => 'Who is Rasmus Lerdorf?',
+                ],
+                1000 => [
+                    'question' => 'These three special letters make Danish keyboards unique among Nordic countries',
+                    'answer' => 'What are Æ, Ø, and Å?',
                 ],
             ],
-            'Package Development' => [
+            'Breaking Prod' => [
                 100 => [
-                    'question' => 'This file defines a package\'s dependencies and metadata',
-                    'answer' => 'What is composer.json?'
-                ],
-                200 => [
-                    'question' => 'This class registers package services with the Laravel container',
-                    'answer' => 'What is a Service Provider?'
+                    'question' => 'The worst day of the week to deploy to production',
+                    'answer' => 'What is Friday?',
                 ],
                 300 => [
-                    'question' => 'This artisan command publishes package configuration files to the application',
-                    'answer' => 'What is vendor:publish?'
+                    'question' => 'This containerization tool ensures "it works on everyone\'s machine"',
+                    'answer' => 'What is Docker?',
                 ],
-                400 => [
-                    'question' => 'This method in a service provider registers package views with Laravel',
-                    'answer' => 'What is loadViewsFrom()?'
+                500 => [
+                    'question' => 'This deployment strategy uses color-coded environments to achieve zero-downtime deployment',
+                    'answer' => 'What is blue-green deployment?',
+                ],
+                1000 => [
+                    'question' => 'This phenomenon occurs when a popular cache key expires and multiple processes try to regenerate it simultaneously',
+                    'answer' => 'What is a cache stampede (or thundering herd)?',
                 ],
             ],
-            'Laravel History' => [
+            'Eloquently Speaking' => [
                 100 => [
-                    'question' => 'This person created the Laravel framework',
-                    'answer' => 'Who is Taylor Otwell?'
-                ],
-                200 => [
-                    'question' => 'Laravel was first released in this year',
-                    'answer' => 'What is 2011?'
+                    'question' => 'This relationship represents the inverse of hasMany',
+                    'answer' => 'What is belongsTo()?',
                 ],
                 300 => [
-                    'question' => 'This was Laravel\'s original codename during development',
-                    'answer' => 'What is (there was no codename)?'
+                    'question' => 'This property specifies which attributes can be mass assigned',
+                    'answer' => 'What is $fillable?',
                 ],
-                400 => [
-                    'question' => 'This Laravel version introduced Laravel Sanctum for API authentication',
-                    'answer' => 'What is Laravel 7?'
+                500 => [
+                    'question' => 'This feature allows models to be "deleted" without removing them from the database',
+                    'answer' => 'What are soft deletes?',
+                ],
+                1000 => [
+                    'question' => 'This feature allows you to listen to model lifecycle events',
+                    'answer' => 'What are model events (or observers)?',
                 ],
             ],
         ];
@@ -160,7 +157,7 @@ class GameSeeder extends Seeder
         // Place one Daily Double randomly
         $eligibleClues = Clue::whereHas('category', function ($query) use ($game) {
             $query->where('game_id', $game->id);
-        })->where('value', '>=', config('jeopardy.game_settings.daily_double_min_value', 200))->get();
+        })->where('value', '>=', config('jeopardy.game_settings.daily_double_min_value', 300))->get();
 
         if ($eligibleClues->isNotEmpty()) {
             $eligibleClues->random()->update(['is_daily_double' => true]);
@@ -170,23 +167,23 @@ class GameSeeder extends Seeder
         $lightningQuestions = [
             [
                 'question' => 'What method adds a where clause to an Eloquent query?',
-                'answer' => 'where()'
+                'answer' => 'where()',
             ],
             [
                 'question' => 'What Blade directive creates a CSRF token field?',
-                'answer' => '@csrf'
+                'answer' => '@csrf',
             ],
             [
                 'question' => 'What artisan command rolls back the last migration batch?',
-                'answer' => 'migrate:rollback'
+                'answer' => 'migrate:rollback',
             ],
             [
                 'question' => 'What facade provides access to the cache?',
-                'answer' => 'Cache'
+                'answer' => 'Cache',
             ],
             [
                 'question' => 'What middleware verifies CSRF tokens on POST requests?',
-                'answer' => 'VerifyCsrfToken'
+                'answer' => 'VerifyCsrfToken',
             ],
         ];
 
@@ -200,6 +197,6 @@ class GameSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Game seeded successfully with ID: ' . $game->id);
+        $this->command->info('Game seeded successfully with ID: '.$game->id);
     }
 }
