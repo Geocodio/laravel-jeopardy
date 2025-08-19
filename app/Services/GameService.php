@@ -91,7 +91,11 @@ class GameService
         $game = Game::findOrFail($gameId);
 
         DB::transaction(function () use ($game) {
-            $game->update(['status' => 'lightning_round']);
+            // Clear current team when transitioning to lightning round
+            $game->update([
+                'status' => 'lightning_round',
+                'current_team_id' => null,
+            ]);
 
             $allQuestions = config('jeopardy.lightning_questions', []);
 

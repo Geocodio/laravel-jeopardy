@@ -65,7 +65,15 @@ class LightningRound extends Component
 
         if (count($this->buzzerOrder) === 1) {
             $this->currentAnsweringTeam = Team::find($teamId);
+
+            // Update game state to set active team
+            $this->game->update(['current_team_id' => $teamId]);
+            $this->game->refresh();
+
             $this->dispatch('buzzer-accepted', teamId: $teamId);
+
+            // Broadcast to all clients that a team has buzzed in
+            broadcast(new \App\Events\GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
         }
     }
 
@@ -130,10 +138,18 @@ class LightningRound extends Component
         if (! empty($this->buzzerOrder)) {
             $nextTeamId = $this->buzzerOrder[0];
             $this->currentAnsweringTeam = Team::find($nextTeamId);
+
+            // Update game state to set next active team
+            $this->game->update(['current_team_id' => $nextTeamId]);
+            $this->game->refresh();
+
             $this->dispatch('buzzer-accepted', teamId: $nextTeamId);
+            broadcast(new \App\Events\GameStateChanged($this->game->id, 'team-selected', ['teamId' => $nextTeamId]));
         } else {
-            // No more teams buzzed, move to next question
+            // No more teams buzzed, clear active team and move to next question
             $this->currentAnsweringTeam = null;
+            $this->game->update(['current_team_id' => null]);
+            $this->game->refresh();
             $this->nextQuestion();
         }
 
@@ -149,6 +165,9 @@ class LightningRound extends Component
             ]);
         }
 
+        // Clear active team when moving to next question
+        $this->game->update(['current_team_id' => null]);
+
         $nextQuestion = $this->game->lightningQuestions
             ->where('is_answered', false)
             ->sortBy('order_position')
@@ -161,7 +180,7 @@ class LightningRound extends Component
         } else {
             // Lightning round complete
             $this->dispatch('lightning-round-complete');
-            $this->game->update(['status' => 'finished']);
+            $this->game->update(['status' => 'finished', 'current_team_id' => null]);
             $this->game->refresh();
         }
     }
