@@ -29,8 +29,6 @@ class HostControl extends Component
 
     public $teams = [];
     
-    // Lightning Round state
-    public ?Team $lightningAnsweringTeam = null;
 
     // Daily Double
     public bool $showDailyDoubleWager = false;
@@ -130,6 +128,11 @@ class HostControl extends Component
             return;
         }
 
+        // Set the team as active (applies to both regular and lightning round)
+        $this->currentTeam = $team;
+        $this->game->current_team_id = $teamId;
+        $this->game->save();
+
         // Check if we're in lightning round
         if ($this->game->status === 'lightning_round') {
             // For lightning round, dispatch the buzzer event to the lightning round component
@@ -145,11 +148,6 @@ class HostControl extends Component
             ]);
         } else {
             // Regular game mode
-            // Set the team as active
-            $this->currentTeam = $team;
-            $this->game->current_team_id = $teamId;
-            $this->game->save();
-
             // Broadcast team selection to all clients
             broadcast(new GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
 
@@ -452,26 +450,110 @@ class HostControl extends Component
     // Lightning Round Question Controls
     public function markLightningCorrect()
     {
-        $this->dispatch('lightning-mark-correct')->to(LightningRound::class);
-        $this->lightningAnsweringTeam = null; // Reset after marking
+        if ($this->currentTeam) {
+            // Award points directly here
+            $scoringService = app(ScoringService::class);
+            
+            // Need to refresh to get the latest lightning questions
+            $this->game->refresh();
+            $currentQuestion = $this->game->lightningQuestions
+                ->where('is_current', true)
+                ->first();
+            
+            if ($currentQuestion) {
+                $scoringService->recordLightningAnswer(
+                    $currentQuestion->id,
+                    $this->currentTeam->id,
+                    true
+                );
+                
+                // Mark question as answered and not current
+                $currentQuestion->update([
+                    'is_current' => false,
+                    'is_answered' => true,
+                ]);
+                
+                // Refresh team to get updated score
+                $this->currentTeam->refresh();
+                
+                // Broadcast score update
+                broadcast(new ScoreUpdated(
+                    $this->game->id,
+                    $this->currentTeam->id,
+                    $this->currentTeam->score,
+                    200,
+                    true
+                ));
+                
+                // Get next question
+                $nextQuestion = $this->game->lightningQuestions
+                    ->where('is_answered', false)
+                    ->sortBy('order_position')
+                    ->first();
+                    
+                if ($nextQuestion) {
+                    $nextQuestion->update(['is_current' => true]);
+                    // Broadcast that we've moved to the next question
+                    broadcast(new GameStateChanged($this->game->id, 'lightning-next-question'));
+                }
+            }
+        }
+        
+        // Clear current team for next question
+        $this->currentTeam = null;
+        $this->game->current_team_id = null;
+        $this->game->save();
+        
+        // Now tell the lightning round component to refresh
+        $this->dispatch('lightning-refresh')->to(LightningRound::class);
+        
+        // Refresh our own game state
+        $this->refreshGame();
     }
 
     public function markLightningIncorrect()
     {
-        $this->dispatch('lightning-mark-incorrect')->to(LightningRound::class);
-        // Don't reset here as another team might buzz in
+        if ($this->currentTeam) {
+            // Deduct points from current team
+            $scoringService = app(ScoringService::class);
+            $scoringService->deductPoints($this->currentTeam->id, 200);
+            
+            // Refresh team to get updated score
+            $this->currentTeam->refresh();
+            
+            // Broadcast score update
+            broadcast(new ScoreUpdated(
+                $this->game->id,
+                $this->currentTeam->id,
+                $this->currentTeam->score,
+                -200,
+                false
+            ));
+            
+            // Clear current team to allow others to buzz in
+            $this->currentTeam = null;
+            $this->game->current_team_id = null;
+            $this->game->save();
+            
+            // Broadcast that buzzers are open again
+            broadcast(new GameStateChanged($this->game->id, 'buzzers-opened'));
+        }
     }
 
     public function skipLightningQuestion()
     {
         $this->dispatch('lightning-skip-question')->to(LightningRound::class);
-        $this->lightningAnsweringTeam = null; // Reset when skipping
+        $this->currentTeam = null; // Reset when skipping
+        $this->game->current_team_id = null;
+        $this->game->save();
     }
 
     public function nextLightningQuestion()
     {
         $this->dispatch('lightning-next-question')->to(LightningRound::class);
-        $this->lightningAnsweringTeam = null; // Reset for next question
+        $this->currentTeam = null; // Reset for next question
+        $this->game->current_team_id = null;
+        $this->game->save();
     }
 
     // Listen for buzzer events from main display
@@ -488,15 +570,39 @@ class HostControl extends Component
     {
         // Track which team buzzed in during lightning round
         if ($this->game->status === 'lightning_round') {
-            $this->lightningAnsweringTeam = Team::find($teamId);
+            $this->currentTeam = Team::find($teamId);
+            $this->game->current_team_id = $teamId;
+            $this->game->save();
         }
+    }
+    
+    #[On('game-state-changed')]
+    public function handleGameStateChanged($state, $data = [])
+    {
+        // Refresh current team when team is selected in lightning round
+        if ($state === 'team-selected' && isset($data['teamId']) && $this->game->status === 'lightning_round') {
+            $this->currentTeam = Team::find($data['teamId']);
+            $this->game->refresh();
+        }
+    }
+    
+    #[On('score-updated')]
+    public function handleScoreUpdated()
+    {
+        // Refresh teams to show updated scores
+        $this->refreshGame();
     }
 
     private function refreshGame()
     {
         $this->game->refresh();
         $this->categories = $this->game->categories->sortBy('position');
-        $this->teams = $this->game->teams;
+        $this->teams = $this->game->teams()->get();
+        
+        // Refresh current team if it exists
+        if ($this->currentTeam) {
+            $this->currentTeam = $this->teams->find($this->currentTeam->id);
+        }
     }
 
     public function render()

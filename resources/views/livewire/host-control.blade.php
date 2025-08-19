@@ -9,7 +9,7 @@
 
                 @if($game->status === 'main_game')
                     <button wire:click="startLightningRound"
-                            class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors">
+                            class="cursor-pointer px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors">
                         ⚡ Start Lightning Round
                     </button>
                 @endif
@@ -103,46 +103,52 @@
                             @php
                                 $currentQuestion = $game->lightningQuestions->where('is_current', true)->first();
                                 $questionsRemaining = $game->lightningQuestions->where('is_answered', false)->count();
+                                $totalQuestions = $game->lightningQuestions->count();
+                                $answeredQuestions = $game->lightningQuestions->where('is_answered', true)->count();
+                                $currentQuestionNumber = $answeredQuestions + 1;
                             @endphp
 
                             @if($currentQuestion)
                                 <div class="mb-6 p-6 bg-purple-900/30 rounded-xl border border-purple-500">
-                                    <h3 class="text-lg text-purple-300 mb-2">Current Question:</h3>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h3 class="text-lg text-purple-300">Current Question:</h3>
+                                        <span class="text-lg font-bold text-yellow-400">Question {{ $currentQuestionNumber }} of {{ $totalQuestions }}</span>
+                                    </div>
                                     <p class="text-2xl font-bold text-white mb-4">{{ $currentQuestion->question_text }}</p>
                                     <p class="text-lg text-gray-400">Answer: <span
                                             class="text-green-400">{{ $currentQuestion->answer_text }}</span></p>
                                 </div>
 
                                 <!-- Lightning Round Controls -->
-                                @if($lightningAnsweringTeam)
+                                @if($currentTeam)
                                     <!-- Team has buzzed in - show team name and correct/wrong buttons -->
                                     <div class="text-center mb-4">
-                                        <p class="text-lg text-yellow-400">{{ $lightningAnsweringTeam->name }} buzzed in!</p>
+                                        <p class="text-lg text-yellow-400">{{ $currentTeam->name }} buzzed in!</p>
                                     </div>
                                 @endif
-                                
+
                                 <div class="flex justify-center gap-4 mt-6">
-                                    @if($lightningAnsweringTeam)
+                                    @if($currentTeam)
                                         <button wire:click="markLightningCorrect"
-                                                class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-white transition-all hover:scale-105">
+                                                class="cursor-pointer px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-white transition-all hover:scale-105">
                                             ✓ Correct (+$200)
                                         </button>
                                         <button wire:click="markLightningIncorrect"
-                                                class="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-bold text-white transition-all hover:scale-105">
+                                                class="cursor-pointer px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-bold text-white transition-all hover:scale-105">
                                             ✗ Wrong
                                         </button>
                                     @else
                                         <!-- No team has buzzed - show waiting message -->
                                         <p class="text-gray-400 self-center">Waiting for teams to buzz in...</p>
                                     @endif
-                                    
+
                                     <!-- Skip/Next buttons always available -->
                                     <button wire:click="skipLightningQuestion"
-                                            class="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-bold text-white transition-all">
+                                            class="cursor-pointer px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-bold text-white transition-all">
                                         Skip Question
                                     </button>
                                     <button wire:click="nextLightningQuestion"
-                                            class="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold text-white transition-all hover:scale-105">
+                                            class="cursor-pointer px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold text-white transition-all hover:scale-105">
                                         → Next Question
                                     </button>
                                 </div>
@@ -224,7 +230,7 @@
                                 <div class="grid grid-cols-4 gap-4">
                                     @foreach($wagerOptions as $amount)
                                         <button wire:click="setDailyDoubleWager({{ $amount }})"
-                                                class="px-6 py-6 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold text-2xl transition-all hover:scale-105
+                                                class="cursor-pointer px-6 py-6 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold text-2xl transition-all hover:scale-105
                                                 {{ $amount == $currentTeam->score && $currentTeam->score > 0 ? 'ring-2 ring-yellow-400' : '' }}">
                                             ${{ number_format($amount) }}
                                             @if($amount == $currentTeam->score && $currentTeam->score > 0)
@@ -287,11 +293,11 @@
                                     <!-- Answer Controls -->
                                     <div class="grid grid-cols-2 gap-4">
                                         <button wire:click="markCorrect"
-                                                class="px-6 py-8 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-2xl transition-all hover:scale-105">
+                                                class="cursor-pointer px-6 py-8 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-2xl transition-all hover:scale-105">
                                             ✓ Correct
                                         </button>
                                         <button wire:click="markIncorrect"
-                                                class="px-6 py-8 bg-red-600 hover:bg-red-700 rounded-lg font-bold text-2xl transition-all hover:scale-105">
+                                                class="cursor-pointer px-6 py-8 bg-red-600 hover:bg-red-700 rounded-lg font-bold text-2xl transition-all hover:scale-105">
                                             ✗ Incorrect
                                         </button>
                                     </div>
@@ -299,11 +305,11 @@
                                     <!-- Skip/Close -->
                                     <div class="mt-4 grid grid-cols-2 gap-4">
                                         <button wire:click="skipClue"
-                                                class="px-6 py-4 bg-gray-600 hover:bg-gray-700 rounded-lg font-bold text-xl transition-all">
+                                                class="cursor-pointer px-6 py-4 bg-gray-600 hover:bg-gray-700 rounded-lg font-bold text-xl transition-all">
                                             Skip Clue
                                         </button>
                                         <button wire:click="closeClue"
-                                                class="px-6 py-4 bg-slate-600 hover:bg-slate-700 rounded-lg font-bold text-xl transition-all">
+                                                class="cursor-pointer px-6 py-4 bg-slate-600 hover:bg-slate-700 rounded-lg font-bold text-xl transition-all">
                                             Close
                                         </button>
                                     </div>
@@ -334,11 +340,11 @@
                             </div>
                             <div class="flex flex-col gap-2">
                                 <button wire:click="adjustScore({{ $team->id }}, 100)"
-                                        class="px-4 py-3 bg-green-600 hover:bg-green-700 rounded text-lg font-bold">
+                                        class="cursor-pointer px-4 py-3 bg-green-600 hover:bg-green-700 rounded text-lg font-bold">
                                     +100
                                 </button>
                                 <button wire:click="adjustScore({{ $team->id }}, -100)"
-                                        class="px-4 py-3 bg-red-600 hover:bg-red-700 rounded text-lg font-bold">
+                                        class="cursor-pointer px-4 py-3 bg-red-600 hover:bg-red-700 rounded text-lg font-bold">
                                     -100
                                 </button>
                             </div>
