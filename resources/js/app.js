@@ -32,6 +32,10 @@ if (window.gameId) {
         .listen('GameStateChanged', (e) => {
             console.log('Game state changed:', e);
             Livewire.dispatch('game-state-changed', e);
+
+            if (e.state === 'lightning-round-complete') {
+                window.location.href = '/game/' + window.gameId + '/leaderboard';
+            }
         })
         .listen('DailyDoubleTriggered', (e) => {
             console.log('Daily double triggered:', e);

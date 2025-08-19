@@ -185,15 +185,4 @@
             </div>
         </div>
     @endif
-
-    <script>
-        document.addEventListener('livewire:init', function () {
-            Livewire.on('lightning-round-complete', function () {
-                // Redirect immediately to leaderboard
-                @if($game)
-                    window.location.href = '{{ route("game.leaderboard", ["gameId" => $game->id]) }}';
-                @endif
-            });
-        });
-    </script>
 </div>

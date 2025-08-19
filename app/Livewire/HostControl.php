@@ -73,7 +73,7 @@ class HostControl extends Component
         }
 
         // If game just started and no team is selected, select Team Illuminate
-        if ($this->game->status === 'main_game' && ! $this->currentTeam) {
+        if ($this->game->status === 'main_game' && !$this->currentTeam) {
             $teamIlluminate = $this->teams->where('name', 'Team Illuminate')->first();
             if ($teamIlluminate) {
                 $this->selectCurrentTeam($teamIlluminate->id);
@@ -122,7 +122,7 @@ class HostControl extends Component
     {
         $team = Team::find($teamId);
 
-        if (! $team) {
+        if (!$team) {
             return;
         }
 
@@ -183,7 +183,7 @@ class HostControl extends Component
 
     private function getMaximumWager()
     {
-        if (! $this->currentTeam) {
+        if (!$this->currentTeam) {
             return 400; // Default max if no team selected
         }
 
@@ -202,7 +202,7 @@ class HostControl extends Component
 
     private function calculateWagerOptions()
     {
-        if (! $this->currentTeam) {
+        if (!$this->currentTeam) {
             $this->wagerOptions = [];
 
             return;
@@ -218,13 +218,13 @@ class HostControl extends Component
         $increments = [200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000];
 
         foreach ($increments as $amount) {
-            if ($amount <= $maxWager && ! in_array($amount, $options)) {
+            if ($amount <= $maxWager && !in_array($amount, $options)) {
                 $options[] = $amount;
             }
         }
 
         // If team score is positive and not already in options, add it as "True Daily Double"
-        if ($this->currentTeam->score > 0 && ! in_array($this->currentTeam->score, $options)) {
+        if ($this->currentTeam->score > 0 && !in_array($this->currentTeam->score, $options)) {
             $options[] = $this->currentTeam->score;
         }
 
@@ -238,7 +238,7 @@ class HostControl extends Component
     {
         $team = $teamId ? Team::find($teamId) : $this->currentTeam;
 
-        if (! $team || ! $this->selectedClue) {
+        if (!$team || !$this->selectedClue) {
             return;
         }
 
@@ -302,7 +302,7 @@ class HostControl extends Component
     {
         $team = $teamId ? Team::find($teamId) : $this->currentTeam;
 
-        if (! $team || ! $this->selectedClue) {
+        if (!$team || !$this->selectedClue) {
             return;
         }
 
@@ -319,7 +319,7 @@ class HostControl extends Component
         }
 
         // Clear current team to open buzzers for others (unless Daily Double)
-        if (! $this->selectedClue->is_daily_double) {
+        if (!$this->selectedClue->is_daily_double) {
             $this->currentTeam = null;
             $this->game->current_team_id = null;
             $this->game->save();
@@ -384,7 +384,7 @@ class HostControl extends Component
     public function adjustScore($teamId, $amount)
     {
         $team = Team::find($teamId);
-        if (! $team) {
+        if (!$team) {
             return;
         }
 
@@ -409,7 +409,7 @@ class HostControl extends Component
         $gameService = app(GameService::class);
         $gameService->transitionToLightningRound($this->game->id);
 
-        $this->game->refresh();
+        $this->currentTeam = null; // Clear current team
 
         // Broadcast event to tell game board to navigate to lightning round
         broadcast(new GameStateChanged($this->game->id, 'lightning-round-started'));
@@ -457,16 +457,7 @@ class HostControl extends Component
                 ));
 
                 // Get next question
-                $nextQuestion = $this->game->lightningQuestions
-                    ->where('is_answered', false)
-                    ->sortBy('order_position')
-                    ->first();
-
-                if ($nextQuestion) {
-                    $nextQuestion->update(['is_current' => true]);
-                    // Broadcast that we've moved to the next question
-                    broadcast(new GameStateChanged($this->game->id, 'lightning-next-question'));
-                }
+                $this->nextLightningQuestion();
             }
         }
 
@@ -511,27 +502,11 @@ class HostControl extends Component
         }
     }
 
-    public function skipLightningQuestion()
-    {
-        $this->dispatch('lightning-skip-question')->to(LightningRound::class);
-        $this->currentTeam = null; // Reset when skipping
-        $this->game->current_team_id = null;
-        $this->game->save();
-    }
-
-    public function nextLightningQuestion()
-    {
-        $this->dispatch('lightning-next-question')->to(LightningRound::class);
-        $this->currentTeam = null; // Reset for next question
-        $this->game->current_team_id = null;
-        $this->game->save();
-    }
-
     // Listen for buzzer events from main display
     #[On('buzzer-webhook-received')]
     public function handleBuzzerWebhook($teamId)
     {
-        if ($this->showClueModal && ! $this->currentTeam && ! $this->selectedClue->is_daily_double) {
+        if ($this->showClueModal && !$this->currentTeam && !$this->selectedClue->is_daily_double) {
             $this->currentTeam = Team::find($teamId);
         }
     }
@@ -551,7 +526,7 @@ class HostControl extends Component
     public function handleGameStateChanged($state, $data = [])
     {
         // Handle team selection events from both manual triggers and buzzer API
-        if (in_array($state, ['team-selected', 'buzzer-pressed']) && isset($data['teamId'])) {
+        if (in_array($state, ['team-selected', 'buzzer-pressed', 'lightning-round-started']) && isset($data['teamId'])) {
             $this->currentTeam = Team::find($data['teamId']);
             $this->game->current_team_id = $data['teamId'];
             $this->refreshGame();
@@ -581,5 +556,32 @@ class HostControl extends Component
     {
         return view('livewire.host-control')
             ->layout('layouts.game');
+    }
+
+    /**
+     * @return void
+     */
+    public function nextLightningQuestion(): void
+    {
+        $nextQuestion = $this->game->lightningQuestions
+            ->where('is_answered', false)
+            ->sortBy('order_position')
+            ->first();
+
+        if ($nextQuestion) {
+            $nextQuestion->update(['is_current' => true]);
+            // Broadcast that we've moved to the next question
+            broadcast(new GameStateChanged($this->game->id, 'lightning-next-question'));
+        } else {
+            // Lightning round complete
+            $this->game->update(['status' => 'finished', 'current_team_id' => null]);
+            $this->game->refresh();
+
+            // Dispatch to browser for redirect - this will trigger the JavaScript listener
+            $this->dispatch('lightning-round-complete');
+
+            // Also broadcast to all clients
+            broadcast(new GameStateChanged($this->game->id, 'lightning-round-complete', []));
+        }
     }
 }

@@ -146,10 +146,6 @@
                                     @endif
 
                                     <!-- Skip/Next buttons always available -->
-                                    <button wire:click="skipLightningQuestion"
-                                            class="cursor-pointer px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-bold text-white transition-all">
-                                        Skip Question
-                                    </button>
                                     <button wire:click="nextLightningQuestion"
                                             class="cursor-pointer px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold text-white transition-all hover:scale-105">
                                         → Next Question

@@ -2,10 +2,10 @@
 
 namespace App\Livewire;
 
+use App\Events\GameStateChanged;
 use App\Models\Game;
 use App\Models\LightningQuestion;
 use App\Models\Team;
-use App\Services\ScoringService;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -31,7 +31,7 @@ class LightningRound extends Component
             $this->game->refresh();
 
             // Broadcast to clear team selection on all clients
-            broadcast(new \App\Events\GameStateChanged($this->game->id, 'team-deselected'));
+            broadcast(new GameStateChanged($this->game->id, 'team-deselected'));
         }
 
         $this->loadCurrentQuestion();
@@ -43,7 +43,7 @@ class LightningRound extends Component
             ->where('is_current', true)
             ->first();
 
-        if (! $this->currentQuestion) {
+        if (!$this->currentQuestion) {
             $this->currentQuestion = $this->game->lightningQuestions
                 ->where('is_answered', false)
                 ->sortBy('order_position')
@@ -69,7 +69,7 @@ class LightningRound extends Component
             return;
         }
 
-        if (! in_array($teamId, $this->buzzerOrder)) {
+        if (!in_array($teamId, $this->buzzerOrder)) {
             $this->buzzerOrder[] = $teamId;
         }
 
@@ -83,7 +83,7 @@ class LightningRound extends Component
             $this->dispatch('buzzer-accepted', teamId: $teamId);
 
             // Broadcast to all clients that a team has buzzed in
-            broadcast(new \App\Events\GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
+            broadcast(new GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
         }
     }
 
@@ -98,122 +98,12 @@ class LightningRound extends Component
         }
     }
 
-    #[On('lightning-mark-correct')]
-    public function handleMarkCorrect()
-    {
-        $this->markLightningCorrect();
-    }
-
-    #[On('lightning-mark-incorrect')]
-    public function handleMarkIncorrect()
-    {
-        $this->markLightningIncorrect();
-    }
-
-    #[On('lightning-skip-question')]
-    public function handleSkipQuestion()
-    {
-        $this->skipQuestion();
-    }
-
-    #[On('lightning-next-question')]
-    public function handleNextQuestion()
-    {
-        $this->nextQuestion();
-    }
-
     #[On('lightning-refresh')]
     public function handleRefresh()
     {
         // Reload the game with fresh lightning questions
         $this->game = Game::with('lightningQuestions', 'teams')->findOrFail($this->game->id);
         $this->loadCurrentQuestion();
-    }
-
-    public function markLightningCorrect()
-    {
-        if (! $this->currentAnsweringTeam || ! $this->currentQuestion) {
-            return;
-        }
-
-        $scoringService = app(ScoringService::class);
-        $scoringService->recordLightningAnswer(
-            $this->currentQuestion->id,
-            $this->currentAnsweringTeam->id,
-            true
-        );
-
-        $this->dispatch('play-sound', sound: 'correct');
-        $this->nextQuestion();
-    }
-
-    public function markLightningIncorrect()
-    {
-        if (! $this->currentAnsweringTeam || ! $this->currentQuestion) {
-            return;
-        }
-
-        // Remove team from current question and try next in buzzer order
-        array_shift($this->buzzerOrder);
-
-        if (! empty($this->buzzerOrder)) {
-            $nextTeamId = $this->buzzerOrder[0];
-            $this->currentAnsweringTeam = Team::find($nextTeamId);
-
-            // Update game state to set next active team
-            $this->game->update(['current_team_id' => $nextTeamId]);
-            $this->game->refresh();
-
-            $this->dispatch('buzzer-accepted', teamId: $nextTeamId);
-            broadcast(new \App\Events\GameStateChanged($this->game->id, 'team-selected', ['teamId' => $nextTeamId]));
-        } else {
-            // No more teams buzzed, clear active team and move to next question
-            $this->currentAnsweringTeam = null;
-            $this->game->update(['current_team_id' => null]);
-            $this->game->refresh();
-            $this->nextQuestion();
-        }
-
-        $this->dispatch('play-sound', sound: 'incorrect');
-    }
-
-    public function nextQuestion()
-    {
-        if ($this->currentQuestion) {
-            $this->currentQuestion->update([
-                'is_current' => false,
-                'is_answered' => true,
-            ]);
-        }
-
-        // Clear active team when moving to next question
-        $this->game->update(['current_team_id' => null]);
-
-        $nextQuestion = $this->game->lightningQuestions
-            ->where('is_answered', false)
-            ->sortBy('order_position')
-            ->first();
-
-        if ($nextQuestion) {
-            $nextQuestion->update(['is_current' => true]);
-            $this->loadCurrentQuestion();
-            $this->dispatch('reset-buzzers');
-        } else {
-            // Lightning round complete
-            $this->game->update(['status' => 'finished', 'current_team_id' => null]);
-            $this->game->refresh();
-
-            // Dispatch to browser for redirect - this will trigger the JavaScript listener
-            $this->dispatch('lightning-round-complete');
-
-            // Also broadcast to all clients
-            broadcast(new \App\Events\GameStateChanged($this->game->id, 'lightning-round-complete', []));
-        }
-    }
-
-    public function skipQuestion()
-    {
-        $this->nextQuestion();
     }
 
     public function render()
