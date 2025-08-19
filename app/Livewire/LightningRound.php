@@ -82,6 +82,9 @@ class LightningRound extends Component
     {
         if ($state === 'buzzer-pressed' && isset($data['teamId'])) {
             $this->handleBuzzer($data['teamId']);
+        } elseif ($state === 'lightning-next-question') {
+            // Refresh when host moves to next question
+            $this->handleRefresh();
         }
     }
 
@@ -107,6 +110,14 @@ class LightningRound extends Component
     public function handleNextQuestion()
     {
         $this->nextQuestion();
+    }
+    
+    #[On('lightning-refresh')]
+    public function handleRefresh()
+    {
+        // Reload the game with fresh lightning questions
+        $this->game = Game::with('lightningQuestions', 'teams')->findOrFail($this->game->id);
+        $this->loadCurrentQuestion();
     }
 
     public function markLightningCorrect()
