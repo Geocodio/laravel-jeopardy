@@ -116,25 +116,23 @@
 
                     <!-- Team Display -->
                     @if($buzzerTeam)
-                        <div class="text-center mt-8"
-                             x-show="showContent"
-                             x-transition:enter="transition ease-out duration-500"
-                             x-transition:enter-start="opacity-0 translate-y-4"
-                             x-transition:enter-end="opacity-100 translate-y-0">
-                            <div
-                                class="inline-flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-lg bg-white/10 border-2"
-                                style="border-color: {{ $buzzerTeam->color_hex }}">
-                                <div class="w-4 h-4 rounded-full animate-pulse"
-                                     style="background-color: {{ $buzzerTeam->color_hex }}"></div>
-                                <span class="text-2xl font-bold" style="color: {{ $buzzerTeam->color_hex }}">
-                                    @if($clue && $clue->category && $clue->category->game && $clue->category->game->current_team_id == $buzzerTeam->id)
-                                        {{ $buzzerTeam->name }}'s turn to answer
-                                    @else
+                        @unless($clue && $clue->category && $clue->category->game && $clue->category->game->current_team_id == $buzzerTeam->id)
+                            <div class="text-center mt-8"
+                                 x-show="showContent"
+                                 x-transition:enter="transition ease-out duration-500"
+                                 x-transition:enter-start="opacity-0 translate-y-4"
+                                 x-transition:enter-end="opacity-100 translate-y-0">
+                                <div
+                                    class="inline-flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-lg bg-white/10 border-2"
+                                    style="border-color: {{ $buzzerTeam->color_hex }}">
+                                    <div class="w-4 h-4 rounded-full animate-pulse"
+                                         style="background-color: {{ $buzzerTeam->color_hex }}"></div>
+                                    <span class="text-2xl font-bold" style="color: {{ $buzzerTeam->color_hex }}">
                                         {{ $buzzerTeam->name }} buzzed in!
-                                    @endif
                                 </span>
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     @endif
                 </div>
             </div>
