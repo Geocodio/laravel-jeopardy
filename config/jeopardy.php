@@ -37,7 +37,5 @@ return [
 
     'sound_effects' => [
         'daily_double' => 'sounds/daily-double.mp3',
-        'times_up' => 'sounds/times-up.mp3',
-        'right_answer' => 'sounds/right-answer.mp3',
     ],
 ];

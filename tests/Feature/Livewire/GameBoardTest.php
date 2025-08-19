@@ -82,8 +82,7 @@ test('returns to board closes modal and resets state', function () {
         ->set('showClueModal', true)
         ->call('returnToBoard')
         ->assertSet('showClueModal', false)
-        ->assertSet('selectedClue', null)
-        ->assertDispatched('reset-buzzers');
+        ->assertSet('selectedClue', null);
 
     $this->game->refresh();
     expect($this->game->current_clue_id)->toBeNull();

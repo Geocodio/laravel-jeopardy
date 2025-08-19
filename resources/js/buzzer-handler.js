@@ -4,8 +4,6 @@ class BuzzerHandler {
     constructor() {
         this.isListening = false;
         this.lockedOutTeams = new Set();
-        this.lastBuzz = {};
-        this.debounceTime = 100; // milliseconds
     }
 
     init() {
@@ -29,7 +27,6 @@ class BuzzerHandler {
             this.resetBuzzers();
         });
 
-
         // Handle buzzer lockout
         Livewire.on('lockout-team', ({teamId, duration}) => {
             this.lockoutTeam(teamId, duration);
@@ -48,7 +45,6 @@ class BuzzerHandler {
 
     resetBuzzers() {
         this.lockedOutTeams.clear();
-        this.lastBuzz = {};
         this.isListening = true;
         console.log('Buzzers reset');
     }
@@ -59,59 +55,6 @@ class BuzzerHandler {
             this.lockedOutTeams.delete(teamId);
             console.log(`Team ${teamId} lockout expired`);
         }, duration);
-    }
-
-    processBuzz(teamId) {
-        if (!this.isListening) {
-            console.log(`Buzz rejected - not listening (Team ${teamId})`);
-            return false;
-        }
-
-        if (this.lockedOutTeams.has(teamId)) {
-            console.log(`Buzz rejected - team locked out (Team ${teamId})`);
-            return false;
-        }
-
-        // Debounce check
-        const now = Date.now();
-        if (this.lastBuzz[teamId] && (now - this.lastBuzz[teamId]) < this.debounceTime) {
-            console.log(`Buzz rejected - debounced (Team ${teamId})`);
-            return false;
-        }
-
-        this.lastBuzz[teamId] = now;
-
-        // Emit buzzer event to Livewire
-        Livewire.dispatch('buzzer-webhook-received', {
-            teamId: teamId,
-        });
-
-        console.log(`Buzz accepted (Team ${teamId})`);
-        return true;
-    }
-
-    // Test buzzer connection
-    testBuzzer(pin) {
-        fetch('/api/buzzer/test', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({pin: pin})
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log(`Buzzer test successful: ${data.team_name}`);
-                    window.playSound('buzzer');
-                } else {
-                    console.error(`Buzzer test failed: ${data.message}`);
-                }
-            })
-            .catch(error => {
-                console.error('Buzzer test error:', error);
-            });
     }
 }
 
