@@ -47,16 +47,16 @@ return [
                     'answer' => 'What is "Red"?',
                 ],
                 300 => [
-                    'question' => 'Taylor\'s 2014 hit about relationships gone wrong also describes what PHP throws when you try to echo an uninitialized variable',
-                    'answer' => 'What is "Blank Space"?',
+                    'question' => 'Taylor Otwell\'s take on server management and deployment, this SaaS platform lets you provision and manage servers without the command line hassle',
+                    'answer' => 'What is Laravel Forge?',
                 ],
                 500 => [
-                    'question' => 'Before creating Laravel, Taylor Otwell programmed in this 1960s business language',
-                    'answer' => 'What is COBOL?',
+                    'question' => 'Taylor\'s 2014 hit about relationships gone wrong also describes what PHP displays when you echo an uninitialized variable',
+                    'answer' => 'What is "Blank Space"?',
                 ],
                 1000 => [
-                    'question' => 'Taylor Otwell played this sport after school every day growing up',
-                    'answer' => 'What is basketball?',
+                    'question' => 'Before creating Laravel, Taylor Otwell programmed in this 1960s business language',
+                    'answer' => 'What is COBOL?',
                 ],
             ],
         ],
@@ -67,12 +67,12 @@ return [
                     'answer' => 'What is 401 (Unauthorized)?',
                 ],
                 300 => [
-                    'question' => 'This Laravel package provides a beautiful debugging interface to inspect errors',
+                    'question' => 'This package provides a beautiful debugging interface to inspect errors',
                     'answer' => 'What is Debugbar for Laravel?',
                 ],
                 500 => [
                     'question' => 'This error occurs when PHP runs out of allocated memory',
-                    'answer' => 'What is "Fatal error: Allowed memory size exhausted"?',
+                    'answer' => 'What is "Fatal error: Allowed Memory Size of X Bytes Exhausted"?',
                 ],
                 1000 => [
                     'question' => 'This HTTP status code means "I\'m a teapot" and was an April Fool\'s joke',
@@ -91,11 +91,11 @@ return [
                     'answer' => 'What are Sydney and Brisbane?',
                 ],
                 500 => [
-                    'question' => 'This U.S. capital city hosted the very first Laracon in 2013',
+                    'question' => 'This U.S. city hosted the very first Laracon in 2013',
                     'answer' => 'What is Washington, DC?',
                 ],
                 1000 => [
-                    'question' => 'This entrepreneur had the vision for the first Laracon',
+                    'question' => 'This entrepreneur had the vision for the first Laracon.', // Hint: He is also knwn as the "Godfather of Laravel"
                     'answer' => 'Who is Ian Landsman?',
                 ],
             ],
@@ -103,12 +103,12 @@ return [
         'Rød Grød Med Fløde' => [
             'clues' => [
                 100 => [
-                    'question' => 'This Danish shipping giant is the world\'s second-largest container company',
-                    'answer' => 'What is Maersk?',
+                    'question' => 'This Danish beer brand modestly claims to be "probably" the world\'s best',
+                    'answer' => 'What is Carlsberg?',
                 ],
                 300 => [
-                    'question' => 'These seafarers from whom Europe\'s oldest monarchy traces back',
-                    'answer' => 'Who are the Vikings?',
+                    'question' => 'This voice and messaging service was co-founded by a Danish-Estonian duo before being sold to Microsoft for $8.5B',
+                    'answer' => 'What is Skype?',
                 ],
                 500 => [
                     'question' => 'This Danish programmer created PHP in 1994 and was born in Greenland',
@@ -164,68 +164,56 @@ return [
 
     'lightning_questions' => [
         // Laravel/PHP Quick Recognition
-        ['question' => 'The default Laravel database driver', 'answer' => 'SQLite'],
-        ['question' => 'Laravel\'s CLI tool name', 'answer' => 'Artisan'],
-        ['question' => 'Laravel\'s ORM', 'answer' => 'Eloquent'],
-        ['question' => 'Default Laravel testing framework', 'answer' => 'Pest or PHPUnit'],
-        ['question' => 'Laravel\'s frontend scaffolding tool', 'answer' => 'Breeze'],
-        ['question' => 'Laravel\'s real-time event broadcasting', 'answer' => 'Echo'],
-        ['question' => 'Laravel\'s default queue connection', 'answer' => 'sync'],
-        ['question' => 'Laravel\'s blade directive for CSRF', 'answer' => '@csrf'],
-        ['question' => 'Laravel\'s creator', 'answer' => 'Taylor Otwell'],
-        ['question' => 'Laravel\'s package manager', 'answer' => 'Composer'],
+        ['question' => 'What is the default Laravel database driver in Laravel 12?', 'answer' => 'SQLite'],
+        ['question' => 'What is Laravel\'s CLI tool name?', 'answer' => 'Artisan'],
+        ['question' => 'What is Laravel\'s ORM called?', 'answer' => 'Eloquent'],
+        ['question' => 'What is the default Laravel testing framework?', 'answer' => 'Pest or PHPUnit'],
+        ['question' => 'What is Laravel\'s real-time event broadcasting tool?', 'answer' => 'Echo'],
+        ['question' => 'What is Laravel\'s blade directive for CSRF protection?', 'answer' => '@csrf'],
+        ['question' => 'Who is the found of Laravel News?', 'answer' => 'Eric Barnes'],
 
         // Laravel Commands
-        ['question' => 'Command to make a new controller', 'answer' => 'php artisan make:controller'],
-        ['question' => 'Command to clear all caches', 'answer' => 'php artisan optimize:clear'],
-        ['question' => 'Command for fresh migrations with seeds', 'answer' => 'php artisan migrate:fresh --seed'],
-        ['question' => 'Command to start the development server', 'answer' => 'php artisan serve'],
-        ['question' => 'Command to create a new model', 'answer' => 'php artisan make:model'],
-        ['question' => 'Command to run tests', 'answer' => 'php artisan test'],
-        ['question' => 'Command to list all routes', 'answer' => 'php artisan route:list'],
-        ['question' => 'Command to create a migration', 'answer' => 'php artisan make:migration'],
+        ['question' => 'What is the command to list all routes?', 'answer' => 'php artisan route:list'],
+        ['question' => 'What is the command to create a new Artisan console command?', 'answer' => 'php artisan make:command'],
 
         // HTTP & Web Basics
-        ['question' => 'HTTP method for creating resources', 'answer' => 'POST'],
-        ['question' => 'HTTP method for updating', 'answer' => 'PUT or PATCH'],
-        ['question' => 'Status code for success', 'answer' => '200'],
-        ['question' => 'Status code for not found', 'answer' => '404'],
-        ['question' => 'Status code for server error', 'answer' => '500'],
-        ['question' => 'Status code for redirect', 'answer' => '301 or 302'],
-        ['question' => 'Status code for unauthorized', 'answer' => '401'],
-        ['question' => 'Status code for forbidden', 'answer' => '403'],
+        ['question' => 'What is the HTTP method commonly used for creating resources?', 'answer' => 'POST'],
+        ['question' => 'What are the HTTP methods commonly used for updating resources?', 'answer' => 'PUT or PATCH'],
+        ['question' => 'What is the HTTP status code for success/OK?', 'answer' => '200'],
+        ['question' => 'What is the HTTP status code for not found?', 'answer' => '404'],
+        ['question' => 'What is the HTTP status code for server error?', 'answer' => '500'],
+        ['question' => 'What are the HTTP status codes for redirect?', 'answer' => '301 or 302'],
+        ['question' => 'What is the HTTP status code for unauthorized?', 'answer' => '401'],
+        ['question' => 'What is the HTTP status code for forbidden?', 'answer' => '403'],
 
         // Frontend/CSS
-        ['question' => 'CSS framework used in this project', 'answer' => 'Tailwind'],
-        ['question' => 'JavaScript framework for reactivity in Livewire', 'answer' => 'Alpine.js'],
-        ['question' => 'Default Vite development server port', 'answer' => '5173'],
-        ['question' => 'CSS property for spacing between flex items', 'answer' => 'gap'],
-        ['question' => 'Tailwind dark mode prefix', 'answer' => 'dark:'],
-        ['question' => 'CSS Grid competitor for layouts', 'answer' => 'Flexbox'],
+        ['question' => 'What is the CSS framework used in this project?', 'answer' => 'Tailwind'],
+        ['question' => 'What is the JavaScript framework used for reactivity in Livewire?', 'answer' => 'Alpine.js'],
+        ['question' => 'What is the Tailwind CSS utility for spacing between flex items?', 'answer' => 'gap'],
+        ['question' => 'What is Tailwind\'s dark mode prefix?', 'answer' => 'dark:'],
+        ['question' => 'What is CSS Grid\'s main competitor for layouts?', 'answer' => 'Flexbox'],
 
         // Danish/Copenhagen Tech
-        ['question' => 'Denmark\'s domain extension', 'answer' => '.dk'],
-        ['question' => 'Danish word for "developer"', 'answer' => 'Udvikler'],
-        ['question' => 'Copenhagen\'s tech district', 'answer' => 'Ørestad'],
-        ['question' => 'Danish currency', 'answer' => 'Kroner or DKK'],
-        ['question' => '"Hello World" in Danish', 'answer' => 'Hej Verden'],
+        ['question' => 'What is Denmark\'s domain extension (tld)?', 'answer' => '.dk'],
+        ['question' => 'What is the Danish word for "developer"?', 'answer' => 'Udvikler'],
+        ['question' => 'What is the Danish currency?', 'answer' => 'Kroner or DKK'],
 
         // Fun/Trivia
-        ['question' => 'PHP originally stood for', 'answer' => 'Personal Home Page'],
-        ['question' => 'Year Laravel was released', 'answer' => '2011'],
-        ['question' => 'PHP\'s elephant mascot name', 'answer' => 'ElePHPant'],
-        ['question' => 'Laravel\'s annual conference', 'answer' => 'Laracon'],
-        ['question' => 'Number of standard HTTP methods', 'answer' => '9'],
-        ['question' => 'Port 3306 is typically used for', 'answer' => 'MySQL'],
-        ['question' => 'Port 5432 is typically used for', 'answer' => 'PostgreSQL'],
-        ['question' => 'Laravel\'s real-time frontend framework', 'answer' => 'Livewire'],
-        ['question' => 'Laravel\'s task scheduling runs via', 'answer' => 'Cron'],
-        ['question' => 'Laravel\'s default session driver', 'answer' => 'database'],
+        ['question' => 'What did PHP originally stand for?', 'answer' => 'Personal Home Page'],
+        ['question' => 'What year was Laravel first released?', 'answer' => '2011'],
+        ['question' => 'What is PHP\'s elephant mascot called?', 'answer' => 'ElePHPant'],
+        ['question' => 'What is Laravel\'s annual conference called?', 'answer' => 'Laracon'],
+        ['question' => 'What database typically uses port 3306?', 'answer' => 'MySQL'],
+        ['question' => 'What database typically uses port 6379?', 'answer' => 'Redis'],
 
         // Additional Laravel-specific questions
-        ['question' => 'What method adds a where clause to an Eloquent query?', 'answer' => 'where()'],
+        ['question' => 'What method skips X rows in an Eloquent query?', 'answer' => 'offset()'],
         ['question' => 'What artisan command rolls back the last migration batch?', 'answer' => 'migrate:rollback'],
         ['question' => 'What facade provides access to the cache?', 'answer' => 'Cache'],
         ['question' => 'What middleware verifies CSRF tokens on POST requests?', 'answer' => 'VerifyCsrfToken'],
+
+        ['question' => 'Which speaker has travelled the furthest to get to Laravel Live Denmark?', 'answer' => 'Leah Thompson'],
+        ['question' => 'Name a speaker that currently works for Laravel', 'answer' => 'Leah Thompson, Nuno Maduro, Ashley Hindle'],
+        ['question' => 'Name a speaker that currently works for Tailwind Labs', 'answer' => 'Peter Suhm'],
     ],
 ];

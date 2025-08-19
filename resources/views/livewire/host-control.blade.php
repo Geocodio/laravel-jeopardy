@@ -17,7 +17,7 @@
 
             <!-- Main Content Grid - Optimized for iPad Pro -->
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <!-- Left Column: Team Controls (smaller) -->
+                <!-- Left Column: Team Controls (always visible) -->
                 <div class="xl:col-span-1 space-y-6">
                     <!-- Combined Team Control Panel -->
                     <div class="bg-slate-800/50 backdrop-blur-lg rounded-xl p-4 border border-slate-700">
@@ -57,24 +57,30 @@
                                                 title="{{ $currentTeam && $currentTeam->id === $team->id ? 'Click to deselect' : 'Set as active team' }}">
                                             @if($currentTeam && $currentTeam->id === $team->id)
                                                 <!-- Check Circle Icon (Active) -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                     stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
                                             @else
                                                 <!-- User Icon (Set Active) -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                     stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
                                                 </svg>
                                             @endif
                                         </button>
-                                        
+
                                         <!-- Trigger Buzzer -->
                                         <button wire:click="triggerBuzzer({{ $team->id }})"
                                                 class="cursor-pointer p-3 rounded-lg transition-all hover:scale-105 bg-purple-600 hover:bg-purple-700 text-white"
                                                 title="Trigger buzzer sound for {{ $team->name }}">
                                             <!-- Bell Alert Icon -->
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0M3.124 7.5A8.969 8.969 0 015.292 3m13.416 0a8.969 8.969 0 012.168 4.5" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                 stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0M3.124 7.5A8.969 8.969 0 015.292 3m13.416 0a8.969 8.969 0 012.168 4.5"/>
                                             </svg>
                                         </button>
                                     </div>
@@ -84,48 +90,115 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Game Board (bigger) -->
+                <!-- Right Column: Game Board or Lightning Round Status -->
                 <div class="xl:col-span-2 bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-                    <!-- All 6 Categories in One Row -->
-                    <div class="grid grid-cols-6 gap-3 mb-4">
-                        @foreach($categories as $category)
-                            <div class="text-base font-bold text-center p-4 bg-blue-800/50 rounded text-yellow-400">
-                                {{ Str::limit($category->name, 15) }}
-                            </div>
-                        @endforeach
-                    </div>
+                    @if($game->status === 'lightning_round')
+                        <!-- Lightning Round Status -->
+                        <div class="text-center mb-6">
+                            <h1 class="text-4xl font-black text-purple-400 mb-2">⚡ LIGHTNING ROUND ⚡</h1>
+                            <p class="text-xl text-purple-300">Control the rapid-fire round</p>
+                        </div>
 
-                    <!-- All Clues in 6 Columns -->
-                    <div class="grid grid-cols-6 gap-3">
-                        @foreach([100, 300, 500, 1000] as $value)
+                        @if($game->lightningQuestions->count() > 0)
+                            @php
+                                $currentQuestion = $game->lightningQuestions->where('is_current', true)->first();
+                                $questionsRemaining = $game->lightningQuestions->where('is_answered', false)->count();
+                            @endphp
+
+                            @if($currentQuestion)
+                                <div class="mb-6 p-6 bg-purple-900/30 rounded-xl border border-purple-500">
+                                    <h3 class="text-lg text-purple-300 mb-2">Current Question:</h3>
+                                    <p class="text-2xl font-bold text-white mb-4">{{ $currentQuestion->question_text }}</p>
+                                    <p class="text-lg text-gray-400">Answer: <span
+                                            class="text-green-400">{{ $currentQuestion->answer_text }}</span></p>
+                                </div>
+
+                                <!-- Lightning Round Controls -->
+                                @if($lightningAnsweringTeam)
+                                    <!-- Team has buzzed in - show team name and correct/wrong buttons -->
+                                    <div class="text-center mb-4">
+                                        <p class="text-lg text-yellow-400">{{ $lightningAnsweringTeam->name }} buzzed in!</p>
+                                    </div>
+                                @endif
+                                
+                                <div class="flex justify-center gap-4 mt-6">
+                                    @if($lightningAnsweringTeam)
+                                        <button wire:click="markLightningCorrect"
+                                                class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-white transition-all hover:scale-105">
+                                            ✓ Correct (+$200)
+                                        </button>
+                                        <button wire:click="markLightningIncorrect"
+                                                class="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-bold text-white transition-all hover:scale-105">
+                                            ✗ Wrong
+                                        </button>
+                                    @else
+                                        <!-- No team has buzzed - show waiting message -->
+                                        <p class="text-gray-400 self-center">Waiting for teams to buzz in...</p>
+                                    @endif
+                                    
+                                    <!-- Skip/Next buttons always available -->
+                                    <button wire:click="skipLightningQuestion"
+                                            class="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-bold text-white transition-all">
+                                        Skip Question
+                                    </button>
+                                    <button wire:click="nextLightningQuestion"
+                                            class="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold text-white transition-all hover:scale-105">
+                                        → Next Question
+                                    </button>
+                                </div>
+                            @else
+                                <div class="text-center p-6 bg-gray-800/50 rounded-xl">
+                                    <p class="text-xl text-gray-400">Lightning Round Complete!</p>
+                                </div>
+                            @endif
+                        @else
+                            <div class="text-center p-6 bg-gray-800/50 rounded-xl">
+                                <p class="text-xl text-gray-400">Setting up lightning round questions...</p>
+                            </div>
+                        @endif
+                    @else
+                        <!-- Regular Game Board -->
+                        <!-- All 6 Categories in One Row -->
+                        <div class="grid grid-cols-6 gap-3 mb-4">
                             @foreach($categories as $category)
-                                @php
-                                    $clue = $category->clues->where('value', $value)->first();
-                                @endphp
-                                @if($clue)
-                                    <button
-                                        wire:click="selectClue({{ $clue->id }})"
-                                        @if($clue->is_answered) disabled @endif
-                                        class="h-24 rounded-lg flex items-center justify-center text-2xl font-bold transition-all
+                                <div class="text-base font-bold text-center p-4 bg-blue-800/50 rounded text-yellow-400">
+                                    {{ $category->name }}
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <!-- All Clues in 6 Columns -->
+                        <div class="grid grid-cols-6 gap-3">
+                            @foreach([100, 300, 500, 1000] as $value)
+                                @foreach($categories as $category)
+                                    @php
+                                        $clue = $category->clues->where('value', $value)->first();
+                                    @endphp
+                                    @if($clue)
+                                        <button
+                                            wire:click="selectClue({{ $clue->id }})"
+                                            @if($clue->is_answered) disabled @endif
+                                            class="h-24 rounded-lg flex items-center justify-center text-2xl font-bold transition-all
                                             {{ $clue->is_answered
                                                 ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
                                                 : 'bg-blue-600 hover:bg-blue-700 cursor-pointer hover:scale-105' }}
                                             {{ $selectedClue && $selectedClue->id === $clue->id ? 'ring-4 ring-yellow-400' : '' }}">
-                                        @if(!$clue->is_answered)
-                                            <span class="text-yellow-400">${{ $value }}</span>
-                                            @if($clue->is_daily_double)
-                                                <span class="ml-1 text-yellow-400">⭐</span>
+                                            @if(!$clue->is_answered)
+                                                <span class="text-yellow-400">${{ $value }}</span>
+                                                @if($clue->is_daily_double)
+                                                    <span class="ml-1 text-yellow-400">⭐</span>
+                                                @endif
+                                            @else
+                                                ✓
                                             @endif
-                                        @else
-                                            ✓
-                                        @endif
-                                    </button>
-                                @else
-                                    <div class="h-24 bg-gray-800/30 rounded-lg"></div>
-                                @endif
+                                        </button>
+                                    @else
+                                        <div class="h-24 bg-gray-800/30 rounded-lg"></div>
+                                    @endif
+                                @endforeach
                             @endforeach
-                        @endforeach
-                    </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -144,7 +217,8 @@
                                         Current Score: ${{ number_format($currentTeam->score) }}
                                     </p>
                                     <p class="text-sm text-gray-400">
-                                        Maximum Wager: ${{ number_format($currentTeam->score > 0 ? $currentTeam->score : 400) }}
+                                        Maximum Wager:
+                                        ${{ number_format($currentTeam->score > 0 ? $currentTeam->score : 400) }}
                                     </p>
                                 </div>
                                 <div class="grid grid-cols-4 gap-4">
@@ -253,7 +327,10 @@
                             class="flex items-center justify-between p-4 rounded-lg border border-slate-600 bg-slate-900/50">
                             <div>
                                 <div class="font-bold text-lg">{{ $team->name }}</div>
-                                <div class="text-3xl font-bold text-green-400">${{ number_format($team->score) }}</div>
+
+                                <div
+                                    class="text-3xl font-bold {{ ($team->score < 0) ? 'text-red-400' : 'text-green-400' }}">
+                                    ${{ number_format($team->score) }}</div>
                             </div>
                             <div class="flex flex-col gap-2">
                                 <button wire:click="adjustScore({{ $team->id }}, 100)"

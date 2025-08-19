@@ -155,6 +155,9 @@ class GameBoard extends Component
             // Answer was incorrect - just refresh scores, keep clue open
             $this->refreshGame();
             // Don't close the modal - other teams can still buzz in
+        } elseif ($state === 'lightning-round-started') {
+            // Navigate to lightning round page
+            $this->redirect(route('game.lightning', ['gameId' => $this->game->id]));
         }
     }
 

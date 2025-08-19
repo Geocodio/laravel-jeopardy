@@ -15,13 +15,6 @@ class BuzzerListener extends Component
 
     public ?Game $game = null;
 
-    protected $buzzerService;
-
-    public function boot(BuzzerService $buzzerService)
-    {
-        $this->buzzerService = $buzzerService;
-    }
-
     public function mount($gameId = null)
     {
         if ($gameId) {
@@ -45,7 +38,7 @@ class BuzzerListener extends Component
             $this->isListening = true;
         }
         $this->lockedOut = [];
-        $this->buzzerService->resetAllBuzzers();
+        app(BuzzerService::class)->resetAllBuzzers();
     }
 
     #[On('open-buzzers')]
@@ -55,7 +48,7 @@ class BuzzerListener extends Component
         // Called when host opens buzzers for all teams
         $this->isListening = true;
         $this->lockedOut = [];
-        $this->buzzerService->resetAllBuzzers();
+        app(BuzzerService::class)->resetAllBuzzers();
     }
 
     #[On('clue-answered')]
@@ -68,7 +61,7 @@ class BuzzerListener extends Component
     public function resetBuzzers()
     {
         $this->lockedOut = [];
-        $this->buzzerService->resetAllBuzzers();
+        app(BuzzerService::class)->resetAllBuzzers();
         $this->isListening = true;
     }
 
@@ -84,7 +77,8 @@ class BuzzerListener extends Component
         }
 
         try {
-            $buzzerEvent = $this->buzzerService->registerBuzz(
+            $buzzerService = app(BuzzerService::class);
+            $buzzerEvent = $buzzerService->registerBuzz(
                 $teamId,
                 $this->game->teams->find($teamId)->buzzer_pin,
                 $timestamp
@@ -93,11 +87,8 @@ class BuzzerListener extends Component
             if ($buzzerEvent->is_first) {
                 $this->dispatch('play-sound', sound: 'buzzer');
 
-                if ($this->game->status === 'main_game') {
-                    $this->dispatch('buzzer-pressed', teamId: $teamId);
-                } else {
-                    $this->dispatch('lightning-buzzer-pressed', teamId: $teamId);
-                }
+                // Always dispatch buzzer-pressed event regardless of game mode
+                $this->dispatch('buzzer-pressed', teamId: $teamId);
             }
         } catch (\Exception $e) {
             // Log error but don't crash
@@ -110,7 +101,8 @@ class BuzzerListener extends Component
 
     public function testBuzzer($pin)
     {
-        $result = $this->buzzerService->testBuzzer($pin);
+        $buzzerService = app(BuzzerService::class);
+        $result = $buzzerService->testBuzzer($pin);
 
         if ($result['success']) {
             $this->dispatch('buzzer-test-success', result: $result);

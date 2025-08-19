@@ -44,6 +44,10 @@
     </div>
     
     @if($game && $currentQuestion)
+        <script>
+            window.gameId = {{ $game->id }};
+        </script>
+        
         <div class="relative container mx-auto px-4 py-8">
             <!-- Title with Electric Effect -->
             <div 
@@ -72,22 +76,6 @@
                 <livewire:team-scoreboard :game-id="$game->id" />
             </div>
             
-            <!-- Questions Remaining Counter -->
-            <div 
-                x-show="mounted"
-                x-transition:enter="transition ease-out duration-1000 delay-400"
-                x-transition:enter-start="opacity-0 scale-0"
-                x-transition:enter-end="opacity-100 scale-100"
-                class="flex justify-center mb-8">
-                <div class="relative">
-                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 blur-xl opacity-50 animate-pulse"></div>
-                    <div class="relative backdrop-blur-lg bg-black/50 rounded-full px-8 py-4 border-2 border-yellow-400/50">
-                        <span class="text-2xl font-bold text-yellow-400">
-                            {{ $questionsRemaining }} Questions Remaining
-                        </span>
-                    </div>
-                </div>
-            </div>
             
             <!-- Current Question with Electric Border -->
             <div 
@@ -167,68 +155,12 @@
                 </div>
             @endif
             
-            <!-- Host Controls with Modern Design -->
-            <div 
-                x-show="mounted"
-                x-transition:enter="transition ease-out duration-1000 delay-800"
-                x-transition:enter-start="opacity-0 translate-y-10"
-                x-transition:enter-end="opacity-100 translate-y-0"
-                class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40">
-                <div class="backdrop-blur-xl bg-black/60 rounded-2xl p-6 border border-purple-500/30 shadow-2xl">
-                    <div class="flex flex-wrap justify-center gap-4">
-                        @if($currentAnsweringTeam)
-                            <button 
-                                wire:click="markLightningCorrect" 
-                                class="group relative inline-flex items-center gap-2 px-6 py-3">
-                                <div class="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
-                                <span class="relative flex items-center gap-2 text-white font-bold">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    Correct (+$200)
-                                </span>
-                            </button>
-                            <button 
-                                wire:click="markLightningIncorrect" 
-                                class="group relative inline-flex items-center gap-2 px-6 py-3">
-                                <div class="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
-                                <span class="relative flex items-center gap-2 text-white font-bold">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                    Wrong (No Penalty)
-                                </span>
-                            </button>
-                        @endif
-                        <button 
-                            wire:click="skipQuestion" 
-                            class="group relative inline-flex items-center gap-2 px-6 py-3">
-                            <div class="absolute inset-0 bg-gradient-to-r from-gray-600 to-gray-700 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
-                            <span class="relative flex items-center gap-2 text-white font-bold">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
-                                </svg>
-                                Skip Question
-                            </span>
-                        </button>
-                        <button 
-                            wire:click="nextQuestion" 
-                            class="group relative inline-flex items-center gap-2 px-6 py-3">
-                            <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-200 animate-pulse"></div>
-                            <span class="relative flex items-center gap-2 text-white font-bold">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                Next Question
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
         
         <!-- Buzzer Listener -->
         <livewire:buzzer-listener :game-id="$game->id" />
+        
+        @include('partials.buzzer-audio')
     @else
         <div class="flex items-center justify-center h-screen">
             <div 

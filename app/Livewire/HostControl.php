@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Events\BuzzerPressed;
 use App\Events\ClueRevealed;
 use App\Events\DailyDoubleTriggered;
 use App\Events\GameStateChanged;
@@ -10,6 +11,7 @@ use App\Models\Clue;
 use App\Models\Game;
 use App\Models\Team;
 use App\Services\BuzzerService;
+use App\Services\GameService;
 use App\Services\ScoringService;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -26,6 +28,9 @@ class HostControl extends Component
     public ?Team $currentTeam = null;
 
     public $teams = [];
+    
+    // Lightning Round state
+    public ?Team $lightningAnsweringTeam = null;
 
     // Daily Double
     public bool $showDailyDoubleWager = false;
@@ -120,28 +125,44 @@ class HostControl extends Component
     public function triggerBuzzer($teamId)
     {
         $team = Team::find($teamId);
-        
-        if (!$team) {
+
+        if (! $team) {
             return;
         }
 
-        // Set the team as active
-        $this->currentTeam = $team;
-        $this->game->current_team_id = $teamId;
-        $this->game->save();
+        // Check if we're in lightning round
+        if ($this->game->status === 'lightning_round') {
+            // For lightning round, dispatch the buzzer event to the lightning round component
+            broadcast(new GameStateChanged($this->game->id, 'buzzer-pressed', ['teamId' => $teamId]));
 
-        // Broadcast team selection to all clients
-        broadcast(new GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
+            // Also broadcast the buzzer sound
+            broadcast(new BuzzerPressed($team));
 
-        // Broadcast buzzer event to trigger sound on game board
-        broadcast(new \App\Events\BuzzerPressed($team));
-        
-        Log::info('Buzzer triggered manually from host control', [
-            'game_id' => $this->game->id,
-            'team_id' => $teamId,
-            'team_name' => $team->name,
-            'set_as_active' => true,
-        ]);
+            Log::info('Lightning round buzzer triggered manually from host control', [
+                'game_id' => $this->game->id,
+                'team_id' => $teamId,
+                'team_name' => $team->name,
+            ]);
+        } else {
+            // Regular game mode
+            // Set the team as active
+            $this->currentTeam = $team;
+            $this->game->current_team_id = $teamId;
+            $this->game->save();
+
+            // Broadcast team selection to all clients
+            broadcast(new GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
+
+            // Broadcast buzzer event to trigger sound on game board
+            broadcast(new BuzzerPressed($team));
+
+            Log::info('Buzzer triggered manually from host control', [
+                'game_id' => $this->game->id,
+                'team_id' => $teamId,
+                'team_name' => $team->name,
+                'set_as_active' => true,
+            ]);
+        }
     }
 
     // Clue Control
@@ -241,27 +262,7 @@ class HostControl extends Component
         // Sort options
         sort($options);
 
-        // Limit to 8 options for UI consistency
-        if (count($options) > 8) {
-            // Keep first few, some middle values, and the max
-            $filtered = [];
-            $filtered[] = $options[0]; // minimum
-
-            // Add evenly distributed values
-            $step = (count($options) - 2) / 6; // We want 6 middle values
-            for ($i = 1; $i <= 6; $i++) {
-                $index = min(round($i * $step), count($options) - 2);
-                if (! in_array($options[$index], $filtered)) {
-                    $filtered[] = $options[$index];
-                }
-            }
-
-            $filtered[] = $options[count($options) - 1]; // maximum
-
-            $this->wagerOptions = $filtered;
-        } else {
-            $this->wagerOptions = $options;
-        }
+        $this->wagerOptions = $options;
     }
 
     public function markCorrect($teamId = null)
@@ -435,11 +436,42 @@ class HostControl extends Component
             return;
         }
 
-        $this->game->update(['status' => 'lightning_round']);
+        // Transition to lightning round
+        $gameService = app(GameService::class);
+        $gameService->transitionToLightningRound($this->game->id);
+
         $this->game->refresh();
 
-        // Redirect to lightning round
-        return redirect()->route('game.lightning', ['gameId' => $this->game->id]);
+        // Broadcast event to tell game board to navigate to lightning round
+        broadcast(new GameStateChanged($this->game->id, 'lightning-round-started'));
+
+        // Host stays on the control page, no redirect
+        $this->refreshGame();
+    }
+
+    // Lightning Round Question Controls
+    public function markLightningCorrect()
+    {
+        $this->dispatch('lightning-mark-correct')->to(LightningRound::class);
+        $this->lightningAnsweringTeam = null; // Reset after marking
+    }
+
+    public function markLightningIncorrect()
+    {
+        $this->dispatch('lightning-mark-incorrect')->to(LightningRound::class);
+        // Don't reset here as another team might buzz in
+    }
+
+    public function skipLightningQuestion()
+    {
+        $this->dispatch('lightning-skip-question')->to(LightningRound::class);
+        $this->lightningAnsweringTeam = null; // Reset when skipping
+    }
+
+    public function nextLightningQuestion()
+    {
+        $this->dispatch('lightning-next-question')->to(LightningRound::class);
+        $this->lightningAnsweringTeam = null; // Reset for next question
     }
 
     // Listen for buzzer events from main display
@@ -448,6 +480,15 @@ class HostControl extends Component
     {
         if ($this->showClueModal && ! $this->currentTeam && ! $this->selectedClue->is_daily_double) {
             $this->currentTeam = Team::find($teamId);
+        }
+    }
+    
+    #[On('buzzer-pressed')]
+    public function handleBuzzerPressed($teamId)
+    {
+        // Track which team buzzed in during lightning round
+        if ($this->game->status === 'lightning_round') {
+            $this->lightningAnsweringTeam = Team::find($teamId);
         }
     }
 

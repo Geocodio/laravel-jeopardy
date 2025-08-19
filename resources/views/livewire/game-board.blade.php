@@ -151,22 +151,7 @@
             <livewire:clue-display :clue-id="$selectedClue->id"/>
         @endif
 
-        <!-- Audio elements for buzzer sounds -->
-        <audio id="buzzer-blade" preload="auto">
-            <source src="/sounds/buzzer/blade.wav" type="audio/wav">
-        </audio>
-        <audio id="buzzer-artisan" preload="auto">
-            <source src="/sounds/buzzer/artisan.wav" type="audio/wav">
-        </audio>
-        <audio id="buzzer-eloquent" preload="auto">
-            <source src="/sounds/buzzer/eloquent.wav" type="audio/wav">
-        </audio>
-        <audio id="buzzer-facade" preload="auto">
-            <source src="/sounds/buzzer/facade.wav" type="audio/wav">
-        </audio>
-        <audio id="buzzer-illuminate" preload="auto">
-            <source src="/sounds/buzzer/illuminate.wav" type="audio/wav">
-        </audio>
+        @include('partials.buzzer-audio')
     @else
         <div class="flex items-center justify-center h-screen">
             <div class="text-center backdrop-blur-lg bg-black/50 rounded-2xl p-12 border border-purple-500/30">

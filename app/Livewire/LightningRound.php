@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Models\Game;
 use App\Models\LightningQuestion;
 use App\Models\Team;
-use App\Services\BuzzerService;
 use App\Services\ScoringService;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -21,16 +20,6 @@ class LightningRound extends Component
     public array $buzzerOrder = [];
 
     public ?Team $currentAnsweringTeam = null;
-
-    protected $scoringService;
-
-    protected $buzzerService;
-
-    public function boot(ScoringService $scoringService, BuzzerService $buzzerService)
-    {
-        $this->scoringService = $scoringService;
-        $this->buzzerService = $buzzerService;
-    }
 
     public function mount($gameId)
     {
@@ -63,8 +52,8 @@ class LightningRound extends Component
         $this->currentAnsweringTeam = null;
     }
 
-    #[On('lightning-buzzer-pressed')]
-    public function handleLightningBuzzer($teamId)
+    #[On('buzzer-pressed')]
+    public function handleBuzzer($teamId)
     {
         if ($this->currentAnsweringTeam) {
             return;
@@ -80,13 +69,46 @@ class LightningRound extends Component
         }
     }
 
+    #[On('game-state-changed')]
+    public function handleGameStateChanged($state, $data = [])
+    {
+        if ($state === 'buzzer-pressed' && isset($data['teamId'])) {
+            $this->handleBuzzer($data['teamId']);
+        }
+    }
+
+    #[On('lightning-mark-correct')]
+    public function handleMarkCorrect()
+    {
+        $this->markLightningCorrect();
+    }
+
+    #[On('lightning-mark-incorrect')]
+    public function handleMarkIncorrect()
+    {
+        $this->markLightningIncorrect();
+    }
+
+    #[On('lightning-skip-question')]
+    public function handleSkipQuestion()
+    {
+        $this->skipQuestion();
+    }
+
+    #[On('lightning-next-question')]
+    public function handleNextQuestion()
+    {
+        $this->nextQuestion();
+    }
+
     public function markLightningCorrect()
     {
         if (! $this->currentAnsweringTeam || ! $this->currentQuestion) {
             return;
         }
 
-        $this->scoringService->recordLightningAnswer(
+        $scoringService = app(ScoringService::class);
+        $scoringService->recordLightningAnswer(
             $this->currentQuestion->id,
             $this->currentAnsweringTeam->id,
             true
