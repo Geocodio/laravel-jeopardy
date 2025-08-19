@@ -2,11 +2,8 @@
 
 namespace App\Events;
 
-use App\Models\Team;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -16,9 +13,13 @@ class ScoreUpdated implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $gameId;
+
     public $teamId;
+
     public $newScore;
+
     public $points;
+
     public $correct;
 
     /**
@@ -41,14 +42,12 @@ class ScoreUpdated implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('game.' . $this->gameId),
+            new Channel('game.'.$this->gameId),
         ];
     }
 
     /**
      * Get the data to broadcast.
-     *
-     * @return array
      */
     public function broadcastWith(): array
     {

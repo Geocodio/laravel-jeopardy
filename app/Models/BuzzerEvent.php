@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class BuzzerEvent extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'team_id',
         'clue_id',

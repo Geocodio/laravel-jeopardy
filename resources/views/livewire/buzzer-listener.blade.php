@@ -27,8 +27,8 @@
                 init() {
                     // Listen for buzzer.pressed event from Laravel Echo
                     if (window.Echo && window.gameId) {
-                        // Listen on the game channel
-                        window.Echo.join(`game.${window.gameId}`)
+                        // Listen on the public game channel
+                        window.Echo.channel(`game.${window.gameId}`)
                             .listen('.buzzer.pressed', (e) => {
                                 console.log('Buzzer pressed event received:', e);
                                 this.playBuzzerSound(e.teamName);

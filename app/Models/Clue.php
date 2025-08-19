@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Clue extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'category_id',
         'question_text',

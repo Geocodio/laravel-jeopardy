@@ -28,7 +28,7 @@ class TeamScoreboard extends Component
     {
         $this->gameId = $gameId;
         $this->refreshScores();
-        
+
         // Check if there's already a current team selected
         $game = \App\Models\Game::find($gameId);
         if ($game && $game->current_team_id) {
@@ -44,24 +44,25 @@ class TeamScoreboard extends Component
             'teamId' => $teamId,
             'newScore' => $newScore,
             'points' => $points,
-            'correct' => $correct
+            'correct' => $correct,
         ]);
-        
-        if (!$teamId) {
+
+        if (! $teamId) {
             $this->refreshScores();
+
             return;
         }
-        
+
         // Store the score change for animation
         $this->recentScoreChanges[$teamId] = [
             'points' => (int) $points,
             'correct' => $correct,
             'timestamp' => now()->timestamp,
         ];
-        
+
         \Log::info('Score change stored', [
             'teamId' => $teamId,
-            'change' => $this->recentScoreChanges[$teamId]
+            'change' => $this->recentScoreChanges[$teamId],
         ]);
 
         $this->refreshScores();
@@ -130,10 +131,10 @@ class TeamScoreboard extends Component
             $teamId = func_get_arg(0);
             $newScore = func_get_arg(1) ?? null;
         }
-        
+
         // Refresh scores when host manually adjusts
         $this->refreshScores();
-        
+
         if ($teamId) {
             // Show animation for adjusted score
             $this->recentScoreChanges[$teamId] = [
@@ -141,7 +142,7 @@ class TeamScoreboard extends Component
                 'correct' => true,
                 'timestamp' => now()->timestamp,
             ];
-            
+
             $this->dispatch('clear-score-animation-js', teamId: $teamId);
         }
     }

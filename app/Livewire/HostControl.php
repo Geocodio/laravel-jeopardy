@@ -165,18 +165,18 @@ class HostControl extends Component
 
     private function getMaximumWager()
     {
-        if (!$this->currentTeam) {
+        if (! $this->currentTeam) {
             return 400; // Default max if no team selected
         }
 
         // Maximum is either current score (if positive) or highest clue value in round
         $teamScore = $this->currentTeam->score;
-        
+
         // Determine the highest clue value based on game phase
         // In regular Jeopardy, max clue value is 400
         // Could be extended for Double Jeopardy round (800) in future
         $highestClueValue = 400;
-        
+
         // If team has positive score, they can wager up to their score
         // If zero or negative, they can wager up to the highest clue value
         return $teamScore > 0 ? $teamScore : $highestClueValue;
@@ -184,51 +184,52 @@ class HostControl extends Component
 
     private function calculateWagerOptions()
     {
-        if (!$this->currentTeam) {
+        if (! $this->currentTeam) {
             $this->wagerOptions = [];
+
             return;
         }
 
         $maxWager = $this->getMaximumWager();
         $options = [];
-        
+
         // Always include minimum wager (we'll use 100 as minimum for simplicity)
         $options[] = 100;
-        
+
         // Add common increments
         $increments = [200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000];
-        
+
         foreach ($increments as $amount) {
-            if ($amount <= $maxWager && !in_array($amount, $options)) {
+            if ($amount <= $maxWager && ! in_array($amount, $options)) {
                 $options[] = $amount;
             }
         }
-        
+
         // If team score is positive and not already in options, add it as "True Daily Double"
-        if ($this->currentTeam->score > 0 && !in_array($this->currentTeam->score, $options)) {
+        if ($this->currentTeam->score > 0 && ! in_array($this->currentTeam->score, $options)) {
             $options[] = $this->currentTeam->score;
         }
-        
+
         // Sort options
         sort($options);
-        
+
         // Limit to 8 options for UI consistency
         if (count($options) > 8) {
             // Keep first few, some middle values, and the max
             $filtered = [];
             $filtered[] = $options[0]; // minimum
-            
+
             // Add evenly distributed values
             $step = (count($options) - 2) / 6; // We want 6 middle values
             for ($i = 1; $i <= 6; $i++) {
                 $index = min(round($i * $step), count($options) - 2);
-                if (!in_array($options[$index], $filtered)) {
+                if (! in_array($options[$index], $filtered)) {
                     $filtered[] = $options[$index];
                 }
             }
-            
+
             $filtered[] = $options[count($options) - 1]; // maximum
-            
+
             $this->wagerOptions = $filtered;
         } else {
             $this->wagerOptions = $options;

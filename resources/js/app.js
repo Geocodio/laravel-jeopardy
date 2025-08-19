@@ -8,9 +8,9 @@ import './game-animations.js';
 // Make confetti available globally for Alpine.js
 window.confetti = confetti;
 
-// Subscribe to private game channel for real-time updates
+// Subscribe to public game channel for real-time updates
 if (window.gameId) {
-    window.Echo.private(`game.${window.gameId}`)
+    window.Echo.channel(`game.${window.gameId}`)
         .listen('BuzzerPressed', (e) => {
             console.log('Buzzer pressed:', e);
             Livewire.dispatch('buzzer-webhook-received', {

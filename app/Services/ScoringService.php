@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Team;
 use App\Models\Clue;
-use App\Models\Game;
 use App\Models\GameLog;
+use App\Models\Team;
 use Illuminate\Support\Facades\DB;
 
 class ScoringService
@@ -16,9 +15,9 @@ class ScoringService
             $team = Team::lockForUpdate()->findOrFail($teamId);
             $oldScore = $team->score;
             $team->increment('score', $amount);
-            
+
             $this->logScoreChange($team->game_id, $teamId, $oldScore, $team->score, 'award');
-            
+
             return $team->fresh();
         });
     }
@@ -29,9 +28,9 @@ class ScoringService
             $team = Team::lockForUpdate()->findOrFail($teamId);
             $oldScore = $team->score;
             $team->decrement('score', $amount);
-            
+
             $this->logScoreChange($team->game_id, $teamId, $oldScore, $team->score, 'deduct');
-            
+
             return $team->fresh();
         });
     }
@@ -39,7 +38,7 @@ class ScoringService
     public function handleDailyDouble(int $teamId, int $wager, bool $correct): Team
     {
         $team = Team::findOrFail($teamId);
-        
+
         // Validate wager
         $maxWager = max($team->score, 1000); // Can wager up to current score or $1000, whichever is higher
         $wager = min($wager, $maxWager);
@@ -47,7 +46,7 @@ class ScoringService
 
         DB::transaction(function () use ($team, $wager, $correct) {
             $oldScore = $team->score;
-            
+
             if ($correct) {
                 $team->increment('score', $wager);
                 $action = 'daily_double_correct';
@@ -55,7 +54,7 @@ class ScoringService
                 $team->decrement('score', $wager);
                 $action = 'daily_double_incorrect';
             }
-            
+
             $this->logScoreChange($team->game_id, $team->id, $oldScore, $team->score, $action, [
                 'wager' => $wager,
                 'correct' => $correct,
@@ -68,10 +67,10 @@ class ScoringService
         return $team->fresh();
     }
 
-    public function getLeaderboard(int $gameId = null): array
+    public function getLeaderboard(?int $gameId = null): array
     {
         $query = Team::query();
-        
+
         if ($gameId) {
             $query->where('game_id', $gameId);
         }
@@ -165,9 +164,10 @@ class ScoringService
     public function formatScore(int $score): string
     {
         if ($score < 0) {
-            return '-$' . number_format(abs($score));
+            return '-$'.number_format(abs($score));
         }
-        return '$' . number_format($score);
+
+        return '$'.number_format($score);
     }
 
     private function logScoreChange(
@@ -195,7 +195,7 @@ class ScoringService
     {
         DB::transaction(function () use ($gameId) {
             Team::where('game_id', $gameId)->update(['score' => 0]);
-            
+
             GameLog::create([
                 'game_id' => $gameId,
                 'action' => 'scores_reset',

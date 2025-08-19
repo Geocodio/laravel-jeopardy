@@ -1,6 +1,6 @@
 <?php
 
-use DanJohnson95\Pinout\Shell\SysFileGPIOD; 
+use DanJohnson95\Pinout\Shell\SysFileGPIOD;
 
 return [
 
@@ -22,6 +22,5 @@ return [
     ],
 
     'sys_file' => SysFileGPIOD::class,
-    'gpio_chip' => 'gpiochip0'
+    'gpio_chip' => 'gpiochip0',
 ];
-

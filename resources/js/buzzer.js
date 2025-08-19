@@ -5,8 +5,8 @@ export function initBuzzerListener(gameId) {
         return;
     }
 
-    // Listen on the game channel
-    window.Echo.join(`game.${gameId}`)
+    // Listen on the public game channel
+    window.Echo.channel(`game.${gameId}`)
         .listen('.buzzer.pressed', (e) => {
             console.log('Buzzer pressed event received:', e);
             playBuzzerSound(e.teamName);

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class LightningQuestion extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'game_id',
         'question_text',

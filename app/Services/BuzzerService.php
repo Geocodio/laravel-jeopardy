@@ -33,7 +33,7 @@ class BuzzerService
                 ->where('is_current', true)
                 ->first();
 
-            if (!$currentQuestion) {
+            if (! $currentQuestion) {
                 throw new Exception('No current lightning question');
             }
 
@@ -50,7 +50,7 @@ class BuzzerService
         return $buzzerEvent;
     }
 
-    public function lockoutTeam(int $teamId, int $duration = null): void
+    public function lockoutTeam(int $teamId, ?int $duration = null): void
     {
         $duration = $duration ?? self::LOCKOUT_DURATION;
         Cache::put("lockout_{$teamId}", true, $duration);
@@ -76,7 +76,7 @@ class BuzzerService
     {
         $team = Team::where('buzzer_pin', $pin)->first();
 
-        if (!$team) {
+        if (! $team) {
             return [
                 'success' => false,
                 'message' => 'No team assigned to this buzzer pin',

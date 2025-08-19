@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\Game;
-use App\Models\Team;
 use App\Models\Category;
 use App\Models\Clue;
-use App\Models\LightningQuestion;
+use App\Models\Game;
 use App\Models\GameLog;
+use App\Models\LightningQuestion;
+use App\Models\Team;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -75,15 +75,15 @@ test('game has many game logs relationship', function () {
 
 test('game can transition through different statuses', function () {
     $game = Game::create(['status' => 'setup']);
-    
+
     expect($game->status)->toBe('setup');
-    
+
     $game->update(['status' => 'main_game']);
     expect($game->status)->toBe('main_game');
-    
+
     $game->update(['status' => 'lightning_round']);
     expect($game->status)->toBe('lightning_round');
-    
+
     $game->update(['status' => 'finished']);
     expect($game->status)->toBe('finished');
 });

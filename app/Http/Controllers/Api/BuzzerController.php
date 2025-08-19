@@ -47,7 +47,7 @@ class BuzzerController extends Controller
 
             return response()->json([
                 'success' => true,
-                //'is_first' => $buzzerEvent->is_first,
+                // 'is_first' => $buzzerEvent->is_first,
                 'team' => $team->name,
             ]);
         } catch (Exception $e) {

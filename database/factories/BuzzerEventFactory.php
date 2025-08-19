@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\BuzzerEvent;
-use App\Models\Team;
 use App\Models\Clue;
+use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BuzzerEventFactory extends Factory

@@ -2,19 +2,27 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
 use Illuminate\Support\Collection;
+use Livewire\Component;
 
 class VolunteerPicker extends Component
 {
     public Collection $attendees;
+
     public array $teams;
+
     public array $selectedVolunteers = [];
+
     public int $currentTeamIndex = -1;
+
     public bool $isShuffling = false;
+
     public array $shufflingNames = [];
+
     public bool $selectionComplete = false;
+
     public ?int $rerollTeamIndex = null;
+
     public ?int $rerollSlotIndex = null;
 
     public function mount(): void
@@ -27,18 +35,19 @@ class VolunteerPicker extends Component
     private function loadAttendees(): void
     {
         $attendeesPath = resource_path('attendees.txt');
-        
-        if (!file_exists($attendeesPath)) {
+
+        if (! file_exists($attendeesPath)) {
             $this->attendees = collect();
+
             return;
         }
 
         $attendeesList = file($attendeesPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        
+
         // Deduplicate and clean names
         $this->attendees = collect($attendeesList)
-            ->map(fn($name) => trim($name))
-            ->filter(fn($name) => !empty($name))
+            ->map(fn ($name) => trim($name))
+            ->filter(fn ($name) => ! empty($name))
             ->unique()
             ->values();
     }
@@ -78,36 +87,37 @@ class VolunteerPicker extends Component
     {
         $this->isShuffling = true;
         $this->shufflingNames = [];
-        
+
         // Get list of already selected volunteers
         $alreadySelected = collect($this->selectedVolunteers)
             ->pluck('members')
             ->flatten()
             ->filter()
             ->toArray();
-        
+
         // Get available attendees
         $available = $this->attendees->diff($alreadySelected)->values();
-        
+
         if ($available->count() < 3) {
             session()->flash('error', 'Not enough attendees available for selection!');
             $this->isShuffling = false;
+
             return;
         }
-        
+
         // Generate shuffling names for animation (20 random names for each slot)
         for ($slot = 0; $slot < 3; $slot++) {
             $this->shufflingNames[$slot] = $available->random(min(20, $available->count()))->toArray();
         }
-        
+
         // Select 3 unique random members
         $selected = $available->random(3)->toArray();
-        
+
         // Store selected members
         $this->selectedVolunteers[$this->currentTeamIndex]['members'] = $selected;
-        
+
         // Dispatch browser event to trigger animation
-        $this->dispatch('start-shuffle', 
+        $this->dispatch('start-shuffle',
             teamIndex: $this->currentTeamIndex,
             shufflingNames: $this->shufflingNames,
             finalNames: $selected
@@ -125,40 +135,41 @@ class VolunteerPicker extends Component
         if ($this->isShuffling) {
             return;
         }
-        
+
         $this->rerollTeamIndex = $teamIndex;
         $this->rerollSlotIndex = $slotIndex;
         $this->isShuffling = true;
-        
+
         // Get current member to exclude
         $currentMember = $this->selectedVolunteers[$teamIndex]['members'][$slotIndex];
-        
+
         // Get list of already selected volunteers (excluding current)
         $alreadySelected = collect($this->selectedVolunteers)
             ->pluck('members')
             ->flatten()
             ->filter()
-            ->reject(fn($name) => $name === $currentMember)
+            ->reject(fn ($name) => $name === $currentMember)
             ->toArray();
-        
+
         // Get available attendees
         $available = $this->attendees->diff($alreadySelected)->values();
-        
+
         if ($available->isEmpty()) {
             session()->flash('error', 'No other attendees available!');
             $this->isShuffling = false;
+
             return;
         }
-        
+
         // Generate shuffling names for animation
         $shufflingNames = $available->random(min(20, $available->count()))->toArray();
-        
+
         // Select new random member
         $newMember = $available->random();
-        
+
         // Update the member
         $this->selectedVolunteers[$teamIndex]['members'][$slotIndex] = $newMember;
-        
+
         // Dispatch browser event to trigger animation for single slot
         $this->dispatch('reroll-member',
             teamIndex: $teamIndex,

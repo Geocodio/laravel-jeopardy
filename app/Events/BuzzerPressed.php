@@ -5,7 +5,6 @@ namespace App\Events;
 use App\Models\Team;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -34,18 +33,16 @@ class BuzzerPressed implements ShouldBroadcastNow
         $channels = [];
 
         if ($this->team->game_id) {
-            $channels[] = new PresenceChannel('game.' . $this->team->game_id);
+            $channels[] = new Channel('game.'.$this->team->game_id);
         }
 
         $channels[] = new Channel('buzzers');
 
         return $channels;
     }
-    
+
     /**
      * Get the data to broadcast.
-     *
-     * @return array
      */
     public function broadcastWith(): array
     {

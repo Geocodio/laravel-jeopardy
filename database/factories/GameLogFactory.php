@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\GameLog;
 use App\Models\Game;
+use App\Models\GameLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class GameLogFactory extends Factory

@@ -4,22 +4,24 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DailyDoubleTriggered
+class DailyDoubleTriggered implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $gameId;
+    public $clueId;
 
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct($gameId, $clueId)
     {
-        //
+        $this->gameId = $gameId;
+        $this->clueId = $clueId;
     }
 
     /**
@@ -30,7 +32,18 @@ class DailyDoubleTriggered
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new Channel('game.'.$this->gameId),
+        ];
+    }
+
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'gameId' => $this->gameId,
+            'clueId' => $this->clueId,
         ];
     }
 }

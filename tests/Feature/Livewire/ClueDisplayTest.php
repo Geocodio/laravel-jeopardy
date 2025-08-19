@@ -36,7 +36,6 @@ test('loads daily double clue correctly', function () {
         ->assertSet('isDailyDouble', true);
 });
 
-
 test('handles buzzer press correctly', function () {
     $team = $this->teams->first();
 
