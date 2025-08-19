@@ -155,6 +155,10 @@
                 <!-- Question Card -->
                 <div
                     class="relative backdrop-blur-xl bg-gradient-to-br from-purple-900/90 to-indigo-900/90 rounded-2xl p-12 border-2 border-white/20 shadow-2xl">
+                    
+                    <!-- Buzzer Status Indicator - Shows when buzzers are open -->
+                    <x-buzzer-indicator :show="!$currentAnsweringTeam" />
+                    
                     <div class="text-center">
                         <p class="text-3xl md:text-5xl font-bold text-white leading-tight animate-pulse">
                             {{ $currentQuestion->question_text }}
