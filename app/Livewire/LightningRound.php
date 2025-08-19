@@ -24,6 +24,16 @@ class LightningRound extends Component
     public function mount($gameId)
     {
         $this->game = Game::with('lightningQuestions', 'teams')->findOrFail($gameId);
+
+        // Clear any lingering team selection from the main game
+        if ($this->game->current_team_id) {
+            $this->game->update(['current_team_id' => null]);
+            $this->game->refresh();
+
+            // Broadcast to clear team selection on all clients
+            broadcast(new \App\Events\GameStateChanged($this->game->id, 'team-deselected'));
+        }
+
         $this->loadCurrentQuestion();
     }
 

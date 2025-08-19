@@ -78,7 +78,7 @@ class BuzzerServer extends Command
     {
         while (true) {
             foreach ($this->ledPins as $id => $pin) {
-                echo 'Turning on '.$id."\n";
+                echo 'Turning on ' . $id . "\n";
                 $pin->turnOff();
                 sleep(1);
                 $pin->turnOn();
@@ -94,11 +94,11 @@ class BuzzerServer extends Command
                 $this->info("Button on pin #{$index} is pressed");
 
                 try {
-                    Http::get('http://sierra.local:8000/api/buzzer', [
+                    Http::timeout(1)->get('http://sierra.local:8000/api/buzzer', [
                         'pin_id' => $index,
                     ]);
                 } catch (Exception $e) {
-                    $this->error("Failed to send request for pin #{$index}: ".$e->getMessage());
+                    $this->error("Failed to send request for pin #{$index}: " . $e->getMessage());
                 }
 
                 for ($i = 0; $i < 5; $i++) {

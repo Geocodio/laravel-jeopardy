@@ -8,6 +8,7 @@ use App\Services\BuzzerService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use RuntimeException;
 
 class BuzzerController extends Controller
 {
@@ -37,6 +38,10 @@ class BuzzerController extends Controller
         };
 
         try {
+            if ($team->game->current_team_id) {
+                throw new RuntimeException('Another team already has the buzzer');
+            }
+
             // Use centralized buzzer handling logic
             $this->buzzerService->handleBuzzerPress($team);
 
