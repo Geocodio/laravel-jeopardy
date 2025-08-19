@@ -5,7 +5,7 @@
 
 set -e
 
-WORK_DIR="/home/pi/laravel-jeopardy"
+WORK_DIR="/home/geocodio/laravel-jeopardy"
 SERVICE_NAME="laravel-buzzer"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 LOG_DIR="/var/log/laravel-buzzer"
@@ -53,7 +53,7 @@ fi
 if [ ! -d "$LOG_DIR" ]; then
     log "Creating log directory at $LOG_DIR..."
     mkdir -p "$LOG_DIR"
-    chown pi:pi "$LOG_DIR"
+    chown geocodio:geocodio "$LOG_DIR"
 fi
 
 # Create wrapper script for the buzzer server
@@ -63,7 +63,7 @@ log "Creating wrapper script at $WRAPPER_SCRIPT..."
 cat > "$WRAPPER_SCRIPT" << 'EOF'
 #!/bin/bash
 
-WORK_DIR="/home/pi/laravel-jeopardy"
+WORK_DIR="/home/geocodio/laravel-jeopardy"
 LOG_DIR="/var/log/laravel-buzzer"
 LOG_FILE="$LOG_DIR/buzzer-server.log"
 ERROR_LOG="$LOG_DIR/buzzer-server-error.log"
@@ -71,7 +71,7 @@ RESTART_LOG="$LOG_DIR/restart.log"
 
 # Ensure log files exist and are writable
 touch "$LOG_FILE" "$ERROR_LOG" "$RESTART_LOG"
-chown pi:pi "$LOG_FILE" "$ERROR_LOG" "$RESTART_LOG"
+chown geocodio:geocodio "$LOG_FILE" "$ERROR_LOG" "$RESTART_LOG"
 
 log_message() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
@@ -92,13 +92,13 @@ MAX_RESTART_DELAY=60
 
 while true; do
     log_message "Starting buzzer server (attempt #$((RESTART_COUNT + 1)))..."
-    
+
     # Run the buzzer server and capture its exit code
     php artisan buzzer-server >> "$LOG_FILE" 2>> "$ERROR_LOG"
     EXIT_CODE=$?
-    
+
     RESTART_COUNT=$((RESTART_COUNT + 1))
-    
+
     if [ $EXIT_CODE -eq 0 ]; then
         log_message "Buzzer server exited normally with code 0"
         log_restart "Normal exit after $RESTART_COUNT restart(s)"
@@ -107,18 +107,18 @@ while true; do
         log_restart "CRASH: Exit code $EXIT_CODE after running. Restart #$RESTART_COUNT"
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Process crashed with exit code $EXIT_CODE" >> "$ERROR_LOG"
     fi
-    
+
     # Calculate restart delay (exponential backoff with max limit)
     if [ $RESTART_COUNT -lt 5 ]; then
         DELAY=$((RESTART_COUNT * 2))
     else
         DELAY=$MAX_RESTART_DELAY
     fi
-    
+
     log_message "Waiting $DELAY seconds before restart..."
     log_restart "Waiting $DELAY seconds before restart #$((RESTART_COUNT + 1))"
     sleep $DELAY
-    
+
     log_message "Restarting buzzer server..."
 done
 EOF
@@ -137,8 +137,8 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-User=pi
-Group=pi
+User=geocodio
+Group=geocodio
 WorkingDirectory=$WORK_DIR
 ExecStart=$WRAPPER_SCRIPT
 Restart=always
@@ -146,7 +146,7 @@ RestartSec=5
 
 # Environment variables
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-Environment="HOME=/home/pi"
+Environment="HOME=/home/geocodio"
 
 # Logging
 StandardOutput=journal
@@ -175,7 +175,7 @@ if systemctl is-active --quiet "$SERVICE_NAME"; then
 else
     log "Enabling service to start on boot..."
     systemctl enable "$SERVICE_NAME"
-    
+
     log "Starting service..."
     systemctl start "$SERVICE_NAME"
 fi
