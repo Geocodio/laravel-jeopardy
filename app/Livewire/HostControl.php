@@ -116,6 +116,34 @@ class HostControl extends Component
         }
     }
 
+    // Trigger buzzer for a team
+    public function triggerBuzzer($teamId)
+    {
+        $team = Team::find($teamId);
+        
+        if (!$team) {
+            return;
+        }
+
+        // Set the team as active
+        $this->currentTeam = $team;
+        $this->game->current_team_id = $teamId;
+        $this->game->save();
+
+        // Broadcast team selection to all clients
+        broadcast(new GameStateChanged($this->game->id, 'team-selected', ['teamId' => $teamId]));
+
+        // Broadcast buzzer event to trigger sound on game board
+        broadcast(new \App\Events\BuzzerPressed($team));
+        
+        Log::info('Buzzer triggered manually from host control', [
+            'game_id' => $this->game->id,
+            'team_id' => $teamId,
+            'team_name' => $team->name,
+            'set_as_active' => true,
+        ]);
+    }
+
     // Clue Control
     public function selectClue($clueId)
     {

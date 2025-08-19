@@ -46,20 +46,36 @@
                                         </div>
                                     </div>
 
-                                    <!-- Control Button -->
-                                    <div>
+                                    <!-- Control Buttons -->
+                                    <div class="flex gap-2">
                                         <!-- Select as Current Team -->
                                         <button wire:click="selectCurrentTeam({{ $team->id }})"
-                                                class="cursor-pointer px-4 py-3 rounded-lg font-bold transition-all hover:scale-105
+                                                class="cursor-pointer p-3 rounded-lg transition-all hover:scale-105
                                                 {{ $currentTeam && $currentTeam->id === $team->id
                                                     ? 'bg-yellow-500 text-slate-900 hover:bg-yellow-600'
                                                     : 'bg-slate-700 hover:bg-slate-600 text-white' }}"
                                                 title="{{ $currentTeam && $currentTeam->id === $team->id ? 'Click to deselect' : 'Set as active team' }}">
                                             @if($currentTeam && $currentTeam->id === $team->id)
-                                                Active ✓
+                                                <!-- Check Circle Icon (Active) -->
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
                                             @else
-                                                Set Active
+                                                <!-- User Icon (Set Active) -->
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                </svg>
                                             @endif
+                                        </button>
+                                        
+                                        <!-- Trigger Buzzer -->
+                                        <button wire:click="triggerBuzzer({{ $team->id }})"
+                                                class="cursor-pointer p-3 rounded-lg transition-all hover:scale-105 bg-purple-600 hover:bg-purple-700 text-white"
+                                                title="Trigger buzzer sound for {{ $team->name }}">
+                                            <!-- Bell Alert Icon -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0M3.124 7.5A8.969 8.969 0 015.292 3m13.416 0a8.969 8.969 0 012.168 4.5" />
+                                            </svg>
                                         </button>
                                     </div>
                                 </div>

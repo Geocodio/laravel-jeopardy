@@ -38,16 +38,10 @@ class BuzzerController extends Controller
         };
 
         try {
-            /*$buzzerEvent = $this->buzzerService->registerBuzz(
-                $team,
-            );*/
-
-            // Broadcast the buzzer event via Livewire
             broadcast(new BuzzerPressed($team))->toOthers();
 
             return response()->json([
                 'success' => true,
-                // 'is_first' => $buzzerEvent->is_first,
                 'team' => $team->name,
             ]);
         } catch (Exception $e) {
