@@ -12,7 +12,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Disable auth completely by providing a dummy auth manager
+        $this->app->singleton('auth', function () {
+            return new class {
+                public function __call($method, $parameters) {
+                    return null;
+                }
+            };
+        });
+        
+        // Disable auth.driver 
+        $this->app->singleton('auth.driver', function () {
+            return new class {
+                public function __call($method, $parameters) {
+                    return null;
+                }
+            };
+        });
     }
 
     /**
@@ -20,7 +36,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Enable broadcasting routes - no auth required
-        Broadcast::routes(['middleware' => ['web']]);
+        // No broadcasting routes needed for public channels
     }
 }
