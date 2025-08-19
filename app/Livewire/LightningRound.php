@@ -111,7 +111,7 @@ class LightningRound extends Component
     {
         $this->nextQuestion();
     }
-    
+
     #[On('lightning-refresh')]
     public function handleRefresh()
     {
@@ -190,9 +190,14 @@ class LightningRound extends Component
             $this->dispatch('reset-buzzers');
         } else {
             // Lightning round complete
-            $this->dispatch('lightning-round-complete');
             $this->game->update(['status' => 'finished', 'current_team_id' => null]);
             $this->game->refresh();
+
+            // Dispatch to browser for redirect - this will trigger the JavaScript listener
+            $this->dispatch('lightning-round-complete');
+
+            // Also broadcast to all clients
+            broadcast(new \App\Events\GameStateChanged($this->game->id, 'lightning-round-complete', []));
         }
     }
 

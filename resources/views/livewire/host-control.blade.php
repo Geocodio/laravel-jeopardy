@@ -1,5 +1,8 @@
 <div class="h-screen overflow-y-auto bg-gradient-to-br from-slate-900 to-slate-800 text-white">
     @if($game)
+        <script>
+            window.gameId = {{ $game->id }};
+        </script>
         <div class="container mx-auto px-4 py-4">
             <!-- Top Bar with Game ID and Lightning Round -->
             <div class="flex justify-between items-center mb-4">

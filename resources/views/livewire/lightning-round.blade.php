@@ -108,7 +108,7 @@
             window.gameId = {{ $game->id }};
         </script>
 
-        <div class="relative container mx-auto px-4 py-8">
+        <div class="relative container mx-auto mt-16 px-4 py-8">
             <!-- Title with Electric Effect -->
             <div
                 x-show="mounted"
@@ -135,7 +135,7 @@
                 x-transition:enter="transition ease-out duration-1000 delay-200"
                 x-transition:enter-start="opacity-0 translate-y-10"
                 x-transition:enter-end="opacity-100 translate-y-0"
-                class="mb-8">
+                class="my-32">
                 <livewire:team-scoreboard :game-id="$game->id"/>
             </div>
 
@@ -155,10 +155,10 @@
                 <!-- Question Card -->
                 <div
                     class="relative backdrop-blur-xl bg-gradient-to-br from-purple-900/90 to-indigo-900/90 rounded-2xl p-12 border-2 border-white/20 shadow-2xl">
-                    
+
                     <!-- Buzzer Status Indicator - Shows when buzzers are open -->
-                    <x-buzzer-indicator :show="!$currentAnsweringTeam" />
-                    
+                    <x-buzzer-indicator :show="!$currentAnsweringTeam"/>
+
                     <div class="text-center">
                         <p class="text-3xl md:text-5xl font-bold text-white leading-tight animate-pulse">
                             {{ $currentQuestion->question_text }}
@@ -185,4 +185,15 @@
             </div>
         </div>
     @endif
+
+    <script>
+        document.addEventListener('livewire:init', function () {
+            Livewire.on('lightning-round-complete', function () {
+                // Redirect immediately to leaderboard
+                @if($game)
+                    window.location.href = '{{ route("game.leaderboard", ["gameId" => $game->id]) }}';
+                @endif
+            });
+        });
+    </script>
 </div>

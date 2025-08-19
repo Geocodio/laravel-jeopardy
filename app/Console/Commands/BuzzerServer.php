@@ -14,7 +14,7 @@ class BuzzerServer extends Command
      *
      * @var string
      */
-    protected $signature = 'app:buzzer-server';
+    protected $signature = 'buzzer-server';
 
     /**
      * The console command description.

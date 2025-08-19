@@ -2,7 +2,9 @@
     x-data="{
         showModal: true,
         showContent: false,
-        isDailyDouble: {{ $isDailyDouble ? 'true' : 'false' }}
+        isDailyDouble: {{ $isDailyDouble ? 'true' : 'false' }},
+        showFloatingScore: false,
+        floatingScore: { amount: 0, teamName: '', teamColor: '' }
     }"
     x-init="
         setTimeout(() => showContent = true, 100);
@@ -10,6 +12,19 @@
             // Play Daily Double sound
             if (window.playSound) window.playSound('daily-double');
         }
+
+        Livewire.on('score-updated', (event) => {
+            if (!event.correct && event.points < 0) {
+                // Show floating score for incorrect answers
+                floatingScore = {
+                    amount: Math.abs(event.points),
+                    teamName: event.teamName || '',
+                    teamColor: event.teamColor || '#ef4444'
+                };
+                showFloatingScore = true;
+                setTimeout(() => showFloatingScore = false, 3000);
+            }
+        });
     "
     class="fixed inset-0 z-50 flex items-center justify-center">
 
@@ -63,7 +78,8 @@
                     class="backdrop-blur-xl bg-gradient-to-br from-blue-900/90 via-indigo-900/90 to-purple-900/90 rounded-3xl p-8 md:p-12 border-2 border-white/20 shadow-2xl">
 
                     <!-- Buzzer Status Indicator - Only shows when buzzers are open -->
-                    <x-buzzer-indicator :show="$clue && $clue->category && $clue->category->game && !$clue->category->game->current_team_id" />
+                    <x-buzzer-indicator
+                        :show="$clue && $clue->category && $clue->category->game && !$clue->category->game->current_team_id"/>
 
                     <!-- Category and Value -->
                     <div class="text-center mb-6"
@@ -89,30 +105,24 @@
                             {{ $clue->question_text }}
                         </p>
                     </div>
-
-
-                    <!-- Team Display -->
-                    @if($buzzerTeam)
-                        @unless($clue && $clue->category && $clue->category->game && $clue->category->game->current_team_id == $buzzerTeam->id)
-                            <div class="text-center mt-8"
-                                 x-show="showContent"
-                                 x-transition:enter="transition ease-out duration-500"
-                                 x-transition:enter-start="opacity-0 translate-y-4"
-                                 x-transition:enter-end="opacity-100 translate-y-0">
-                                <div
-                                    class="inline-flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-lg bg-white/10 border-2"
-                                    style="border-color: {{ $buzzerTeam->color_hex }}">
-                                    <div class="w-4 h-4 rounded-full animate-pulse"
-                                         style="background-color: {{ $buzzerTeam->color_hex }}"></div>
-                                    <span class="text-2xl font-bold" style="color: {{ $buzzerTeam->color_hex }}">
-                                        {{ $buzzerTeam->name }} buzzed in!
-                                </span>
-                                </div>
-                            </div>
-                        @endif
-                    @endif
                 </div>
             </div>
         @endif
     @endif
+
+    <!-- Floating Score Loss Animation -->
+    <div
+        x-show="showFloatingScore"
+        x-transition:enter="transition ease-out duration-500"
+        x-transition:enter-start="opacity-0 translate-y-0 scale-50"
+        x-transition:enter-end="opacity-100 -translate-y-20 scale-100"
+        x-transition:leave="transition ease-in duration-1000"
+        x-transition:leave-start="opacity-100 -translate-y-20 scale-100"
+        x-transition:leave-end="opacity-0 -translate-y-40 scale-110"
+        class="absolute inset-0 flex items-center justify-center pointer-events-none"
+        style="z-index: 100;">
+        <div class="text-8xl md:text-9xl font-black text-red-500 drop-shadow-[0_0_30px_rgba(239,68,68,0.8)]">
+            -$<span x-text="floatingScore.amount"></span>
+        </div>
+    </div>
 </div>

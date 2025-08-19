@@ -24,3 +24,4 @@ Route::get('/game/new', function () {
 Route::get('/game/{gameId}', GameBoard::class)->name('game.board');
 Route::get('/game/{gameId}/host', \App\Livewire\HostControl::class)->name('game.host');
 Route::get('/game/{gameId}/lightning', LightningRound::class)->name('game.lightning');
+Route::get('/game/{gameId}/leaderboard', \App\Livewire\Leaderboard::class)->name('game.leaderboard');

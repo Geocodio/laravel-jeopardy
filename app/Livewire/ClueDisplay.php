@@ -130,7 +130,9 @@ class ClueDisplay extends Component
             $this->dispatch('score-updated',
                 teamId: $this->buzzerTeam->id,
                 points: -$pointsDeducted,
-                correct: false
+                correct: false,
+                teamName: $this->buzzerTeam->name,
+                teamColor: $this->buzzerTeam->color_hex
             );
             $this->dispatch('clue-answered', clueId: $this->clue->id);
             $this->reset(['buzzerTeam', 'showManualTeamSelection', 'wagerAmount']);
@@ -144,7 +146,9 @@ class ClueDisplay extends Component
             $this->dispatch('score-updated',
                 teamId: $this->buzzerTeam->id,
                 points: -$pointsDeducted,
-                correct: false
+                correct: false,
+                teamName: $this->buzzerTeam->name,
+                teamColor: $this->buzzerTeam->color_hex
             );
 
             // Check if this was the controlling team

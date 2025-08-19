@@ -13,6 +13,7 @@ class DailyDoubleTriggered implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $gameId;
+
     public $clueId;
 
     /**

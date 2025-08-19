@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\BuzzerPressed;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
 use App\Services\BuzzerService;
@@ -38,7 +37,8 @@ class BuzzerController extends Controller
         };
 
         try {
-            broadcast(new BuzzerPressed($team))->toOthers();
+            // Use centralized buzzer handling logic
+            $this->buzzerService->handleBuzzerPress($team);
 
             return response()->json([
                 'success' => true,

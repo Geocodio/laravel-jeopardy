@@ -106,4 +106,50 @@ class BuzzerService
 
         return $status;
     }
+
+    /**
+     * Handle buzzer press logic centrally for both manual triggers and API calls
+     * This ensures consistent behavior across all buzzer sources
+     */
+    public function handleBuzzerPress(Team $team): void
+    {
+        $game = $team->game;
+
+        if (! $game) {
+            throw new Exception('Team is not associated with a game');
+        }
+
+        // Set the team as active
+        $game->current_team_id = $team->id;
+        $game->save();
+
+        // Check if we're in lightning round
+        if ($game->status === 'lightning_round') {
+            // For lightning round, dispatch the buzzer event to the lightning round component
+            broadcast(new \App\Events\GameStateChanged($game->id, 'buzzer-pressed', ['teamId' => $team->id]));
+
+            // Also broadcast the buzzer sound
+            broadcast(new \App\Events\BuzzerPressed($team));
+
+            \Log::info('Lightning round buzzer triggered', [
+                'game_id' => $game->id,
+                'team_id' => $team->id,
+                'team_name' => $team->name,
+            ]);
+        } else {
+            // Regular game mode
+            // Broadcast team selection to all clients
+            broadcast(new \App\Events\GameStateChanged($game->id, 'team-selected', ['teamId' => $team->id]));
+
+            // Broadcast buzzer event to trigger sound on game board
+            broadcast(new \App\Events\BuzzerPressed($team));
+
+            \Log::info('Buzzer triggered', [
+                'game_id' => $game->id,
+                'team_id' => $team->id,
+                'team_name' => $team->name,
+                'set_as_active' => true,
+            ]);
+        }
+    }
 }
