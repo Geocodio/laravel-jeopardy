@@ -10,7 +10,23 @@ export function initBuzzerListener(gameId) {
         .listen('.buzzer.pressed', (e) => {
             console.log('Buzzer pressed event received:', e);
             playBuzzerSound(e.teamName);
-        });
+        })
+        .listen('ScoreUpdated', (e) => {
+            let soundFile = e.correct ? 'answer-correct' : 'answer-incorrect';
+
+            const audio = document.getElementById(soundFile);
+            if (audio) {
+                audio.currentTime = 0; // Reset to start
+                audio.play().catch(error => {
+                    console.error('Error playing buzzer sound:', error);
+
+                    // Show user-friendly error message
+                    if (error.name === 'NotAllowedError') {
+                        showAudioPermissionMessage();
+                    }
+                });
+            }
+        })
 
     // Also listen on the general buzzers channel
     window.Echo.channel('buzzers')
@@ -42,7 +58,7 @@ function playBuzzerSound(teamName) {
             audio.currentTime = 0; // Reset to start
             audio.play().catch(error => {
                 console.error('Error playing buzzer sound:', error);
-                
+
                 // Show user-friendly error message
                 if (error.name === 'NotAllowedError') {
                     showAudioPermissionMessage();
@@ -58,7 +74,7 @@ function showAudioPermissionMessage() {
     if (existingMessage) {
         existingMessage.remove();
     }
-    
+
     // Create message element
     const message = document.createElement('div');
     message.id = 'audio-permission-message';
@@ -81,7 +97,7 @@ function showAudioPermissionMessage() {
         max-width: 90%;
         text-align: center;
     `;
-    
+
     message.innerHTML = `
         <div style="display: flex; align-items: center; gap: 12px;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -92,7 +108,7 @@ function showAudioPermissionMessage() {
             <span>🔊 Click anywhere on the page to enable buzzer sounds</span>
         </div>
     `;
-    
+
     // Add CSS animation
     const style = document.createElement('style');
     style.textContent = `
@@ -108,10 +124,10 @@ function showAudioPermissionMessage() {
         }
     `;
     document.head.appendChild(style);
-    
+
     // Add to page
     document.body.appendChild(message);
-    
+
     // Initialize audio on click
     const initAudio = () => {
         // Pre-play all audio elements with volume 0 to initialize them
@@ -124,19 +140,19 @@ function showAudioPermissionMessage() {
                 audio.volume = 1;
             }).catch(e => console.log('Audio init skipped:', audio.id));
         });
-        
+
         // Remove message with fade out
         message.style.animation = 'slideDown 0.3s ease-out reverse';
         setTimeout(() => message.remove(), 300);
-        
+
         // Remove click listener
         document.removeEventListener('click', initAudio);
         console.log('Audio system initialized');
     };
-    
+
     // Add click listener to entire document
     document.addEventListener('click', initAudio);
-    
+
     // Auto-hide after 10 seconds
     setTimeout(() => {
         if (document.getElementById('audio-permission-message')) {

@@ -14,3 +14,9 @@
 <audio id="buzzer-illuminate" preload="auto">
     <source src="/sounds/buzzer/illuminate.wav" type="audio/wav">
 </audio>
+<audio id="answer-correct" preload="auto">
+    <source src="/sounds/answer-correct.wav" type="audio/wav">
+</audio>
+<audio id="answer-incorrect" preload="auto">
+    <source src="/sounds/answer-incorrect.wav" type="audio/wav">
+</audio>

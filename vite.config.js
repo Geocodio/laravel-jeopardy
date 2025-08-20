@@ -17,5 +17,12 @@ export default defineConfig({
     ],
     server: {
         cors: true,
+        host: true,
+        port: 5173,
+        hmr: {
+            host: 'sierra.local',
+            protocol: 'http',
+            clientPort: 5173,
+        },
     },
 });

@@ -31,48 +31,22 @@ return [
 
     'game_settings' => [
         'daily_double_min_value' => 300,
-        'lightning_round_time_limit' => 30,
-        'points_multiplier' => 1,
-    ],
-
-    'sound_effects' => [
-        'daily_double' => 'sounds/daily-double.mp3',
     ],
 
     'categories' => [
-        'Taylor\'s Version' => [
-            'clues' => [
-                100 => [
-                    'question' => 'Swift\'s emotional 2012 album title describes what developers see when tests fail',
-                    'answer' => 'What is "Red"?',
-                ],
-                300 => [
-                    'question' => 'Taylor Otwell\'s take on server management and deployment, this SaaS platform lets you provision and manage servers without the command line hassle',
-                    'answer' => 'What is Laravel Forge?',
-                ],
-                500 => [
-                    'question' => 'Taylor\'s 2014 hit about relationships gone wrong also describes what PHP displays when you echo an uninitialized variable',
-                    'answer' => 'What is "Blank Space"?',
-                ],
-                1000 => [
-                    'question' => 'Before creating Laravel, Taylor Otwell programmed in this 1960s business language',
-                    'answer' => 'What is COBOL?',
-                ],
-            ],
-        ],
         '404: Category Not Found' => [
             'clues' => [
                 100 => [
-                    'question' => 'This HTTP status code is returned when the client should authenticate itself',
-                    'answer' => 'What is 401 (Unauthorized)?',
+                    'question' => 'This Laravel tool provides an interactive shell for testing code',
+                    'answer' => 'What is Tinker?',
                 ],
                 300 => [
-                    'question' => 'This package provides a beautiful debugging interface to inspect errors',
-                    'answer' => 'What is Debugbar for Laravel?',
+                    'question' => 'This Laravel blade directive is used to display unescaped HTML content',
+                    'answer' => 'What is "{!! !!}"?',
                 ],
                 500 => [
-                    'question' => 'This error occurs when PHP runs out of allocated memory',
-                    'answer' => 'What is "Fatal error: Allowed Memory Size of X Bytes Exhausted"?',
+                    'question' => 'This HTTP header is commonly missing when CORS errors occur',
+                    'answer' => 'What is "Access-Control-Allow-Origin"?',
                 ],
                 1000 => [
                     'question' => 'This HTTP status code means "I\'m a teapot" and was an April Fool\'s joke',
@@ -95,7 +69,7 @@ return [
                     'answer' => 'What is Washington, DC?',
                 ],
                 1000 => [
-                    'question' => 'This entrepreneur had the vision for the first Laracon.', // Hint: He is also knwn as the "Godfather of Laravel"
+                    'question' => 'This entrepreneur had the vision for the first Laracon.', // Hint: He is also known as the "Godfather of Laravel"
                     'answer' => 'Who is Ian Landsman?',
                 ],
             ],
@@ -140,6 +114,26 @@ return [
                 ],
             ],
         ],
+        'Taylor\'s Version' => [
+            'clues' => [
+                100 => [
+                    'question' => 'Swift\'s emotional 2012 album title describes what developers see when tests fail',
+                    'answer' => 'What is "Red"?',
+                ],
+                300 => [
+                    'question' => 'Taylor Otwell\'s take on server management and deployment, this SaaS platform lets you provision and manage servers without the command line hassle',
+                    'answer' => 'What is Laravel Forge?',
+                ],
+                500 => [
+                    'question' => 'Taylor\'s 2014 hit about relationships gone wrong also describes what PHP displays when you echo an uninitialized variable',
+                    'answer' => 'What is "Blank Space"?',
+                ],
+                1000 => [
+                    'question' => 'Before creating Laravel, Taylor Otwell programmed in this 1960s business language',
+                    'answer' => 'What is COBOL?',
+                ],
+            ],
+        ],
         'Eloquently Speaking' => [
             'clues' => [
                 100 => [
@@ -170,7 +164,7 @@ return [
         ['question' => 'What is the default Laravel testing framework?', 'answer' => 'Pest or PHPUnit'],
         ['question' => 'What is Laravel\'s real-time event broadcasting tool?', 'answer' => 'Echo'],
         ['question' => 'What is Laravel\'s blade directive for CSRF protection?', 'answer' => '@csrf'],
-        ['question' => 'Who is the found of Laravel News?', 'answer' => 'Eric Barnes'],
+        ['question' => 'Who is the founder of Laravel News?', 'answer' => 'Eric Barnes'],
 
         // Laravel Commands
         ['question' => 'What is the command to list all routes?', 'answer' => 'php artisan route:list'],
@@ -187,7 +181,7 @@ return [
         ['question' => 'What is the HTTP status code for forbidden?', 'answer' => '403'],
 
         // Frontend/CSS
-        ['question' => 'What is the CSS framework used in this project?', 'answer' => 'Tailwind'],
+        ['question' => 'What is the CSS framework used in this project?', 'answer' => 'Tailwind CSS'],
         ['question' => 'What is the JavaScript framework used for reactivity in Livewire?', 'answer' => 'Alpine.js'],
         ['question' => 'What is the Tailwind CSS utility for spacing between flex items?', 'answer' => 'gap'],
         ['question' => 'What is Tailwind\'s dark mode prefix?', 'answer' => 'dark:'],
@@ -207,7 +201,7 @@ return [
         ['question' => 'What database typically uses port 6379?', 'answer' => 'Redis'],
 
         // Additional Laravel-specific questions
-        ['question' => 'What method skips X rows in an Eloquent query?', 'answer' => 'offset()'],
+        ['question' => 'What method skips X rows in an Eloquent query?', 'answer' => 'offset() or skip()'],
         ['question' => 'What artisan command rolls back the last migration batch?', 'answer' => 'migrate:rollback'],
         ['question' => 'What facade provides access to the cache?', 'answer' => 'Cache'],
         ['question' => 'What middleware verifies CSRF tokens on POST requests?', 'answer' => 'VerifyCsrfToken'],
