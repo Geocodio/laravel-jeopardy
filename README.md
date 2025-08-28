@@ -1,6 +1,6 @@
 # Laravel Jeopardy 🎮
 
-A live, interactive Jeopardy game built with Laravel 12, Livewire, and Flux UI - designed for Laravel Live Denmark and other live events.
+A live, interactive Jeopardy game built with Laravel 12, Livewire 3 with Flux UI, and Tailwind CSS 4 - designed for Laravel Live Denmark and other live events.
 
 ![Laravel](https://img.shields.io/badge/Laravel-v12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![Livewire](https://img.shields.io/badge/Livewire-v3-FB70A9?style=for-the-badge&logo=livewire&logoColor=white)
@@ -10,15 +10,17 @@ A live, interactive Jeopardy game built with Laravel 12, Livewire, and Flux UI -
 ## 🎯 Features
 
 - **Real-time Game Board**: Interactive Jeopardy board with categories and clues
-- **WebSocket Buzzer System**: Hardware buzzer integration via Raspberry Pi
+- **WebSocket Buzzer System**: Hardware buzzer integration via Raspberry Pi (using Pinout package)
 - **Team Management**: Multiple teams with real-time score tracking
 - **Special Features**:
   - Daily Double clues with wagering
   - Lightning Round for rapid-fire questions
   - Timer system with automatic timeouts
-  - Sound effects for enhanced gameplay
+  - Sound effects for enhanced gameplay (correct/incorrect answers, countdown timer)
 - **Game State Recovery**: Persistent game state with full recovery capabilities
 - **Admin Controls**: Host interface for managing gameplay
+- **Real-time Broadcasting**: Laravel Reverb for WebSocket connections
+- **Volunteer Picker**: Random volunteer selection from attendee list
 
 ## 🚀 Quick Start
 
@@ -65,10 +67,11 @@ A live, interactive Jeopardy game built with Laravel 12, Livewire, and Flux UI -
    ```
 
    This command starts:
-   - Laravel server on `http://localhost:8000`
+   - Laravel server on `http://0.0.0.0:8000`
    - Vite dev server for hot module replacement
    - Queue worker for background jobs
    - Pail for real-time log monitoring
+   - Reverb WebSocket server for real-time events
 
 ## 🎮 Game Setup
 
@@ -81,25 +84,25 @@ A live, interactive Jeopardy game built with Laravel 12, Livewire, and Flux UI -
 
 ### Buzzer Integration
 
-The game supports hardware buzzers via Raspberry Pi. Configure your buzzer endpoint:
+The game supports hardware buzzers via Raspberry Pi using the Pinout package.
 
-```env
-BUZZER_API_ENDPOINT=http://your-raspberry-pi:3000
-```
-
-The buzzer system sends POST requests to `/api/buzzer` with team identification.
+To set up the buzzer system:
+1. Connect buzzers to GPIO pins (see `app/Console/Commands/BuzzerServer.php` for pin configuration)
+2. Run the buzzer server: `php artisan buzzer-server`
+3. The buzzer server sends events to `/api/buzzer` when buttons are pressed
 
 ## 🏗️ Architecture
 
 ### Tech Stack
 
-- **Backend**: Laravel 12 with Livewire
-- **UI Components**: Flux UI (Livewire component library)
-- **Frontend**: Tailwind CSS 4, Alpine.js
-- **Real-time**: Laravel Broadcasting with Pusher/Ably/Soketi
+- **Backend**: Laravel 12 with Livewire 3
+- **UI Components**: Flux UI 2 (Livewire component library)
+- **Frontend**: Tailwind CSS 4, Alpine.js (included with Livewire)
+- **Real-time**: Laravel Reverb for WebSocket connections
 - **Database**: SQLite (default), MySQL/PostgreSQL supported
-- **Testing**: Pest PHP
-- **Asset Bundling**: Vite
+- **Testing**: Pest PHP 3
+- **Asset Bundling**: Vite 7
+- **Hardware Integration**: Pinout package for GPIO control
 
 ### Project Structure
 
@@ -121,6 +124,7 @@ laravel-jeopardy/
 │   └── seeders/           # Database seeders
 ├── public/
 │   └── sounds/            # Game sound effects
+│       └── buzzer/        # Team-specific buzzer sounds
 └── tests/                 # Test files
 ```
 
@@ -131,6 +135,9 @@ laravel-jeopardy/
 - **TeamScoreboard**: Real-time score tracking
 - **BuzzerListener**: WebSocket event handler
 - **LightningRound**: Speed round implementation
+- **HostControl**: Admin interface for game management
+- **Leaderboard**: Display team standings
+- **VolunteerPicker**: Random attendee selection
 
 ## 🧪 Testing
 
@@ -181,14 +188,12 @@ php artisan migrate:fresh --seed  # Fresh install with data
 ### Buzzer API
 
 ```http
-POST /api/buzzer
-Content-Type: application/json
-
-{
-  "team_id": 1,
-  "timestamp": "2024-01-01T12:00:00Z"
-}
+GET /api/buzzer
+Query Parameters:
+- pin_id: The GPIO pin index of the pressed buzzer
 ```
+
+Receives buzzer events from the hardware buzzer server running on the Raspberry Pi.
 
 ## 🤝 Contributing
 
