@@ -176,29 +176,6 @@ php artisan migrate      # Run migrations
 php artisan migrate:fresh --seed  # Fresh install with data
 ```
 
-### Broadcasting Configuration
-
-For real-time features, configure your broadcasting driver:
-
-```env
-BROADCAST_CONNECTION=pusher
-
-# Pusher Configuration
-PUSHER_APP_ID=your-app-id
-PUSHER_APP_KEY=your-app-key
-PUSHER_APP_SECRET=your-app-secret
-PUSHER_APP_CLUSTER=mt1
-```
-
-## 🎵 Sound Effects
-
-The game includes professional sound effects:
-- `daily-double.mp3` - Daily Double reveal
-- `times-up.mp3` - Timer expiration
-- `right-answer.mp3` - Correct answer
-- `incorrect.mp3` - Wrong answer
-- `buzzer.mp3` - Buzzer press
-
 ## 🔌 API Endpoints
 
 ### Buzzer API
@@ -229,7 +206,6 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 
 - Built for Laravel Live Denmark
 - Inspired by the classic Jeopardy game show
-- Powered by the Laravel and Livewire communities
 
 ---
 

@@ -5,7 +5,6 @@ if (!window.playSound) {
     window.playSound = function (soundName) {
         const sounds = {
             'daily-double': '/sounds/daily-double.mp3',
-            'buzzer': '/sounds/buzzer.mp3'
         };
 
         if (sounds[soundName]) {
